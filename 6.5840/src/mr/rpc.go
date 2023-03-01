@@ -7,8 +7,10 @@ package mr
 //
 
 import (
+	"fmt"
 	"os"
 	"strconv"
+	"time"
 )
 
 //
@@ -16,7 +18,15 @@ import (
 // and reply for an RPC.
 //
 type Task struct {
-	taskType string
+	taskType     string
+	taskid       int
+	mapInputFile string
+	workerId     string
+	deadline     time.Time
+}
+
+func GetTaskUniqueId(taskType string, idx int) string {
+	return fmt.Sprintf("%s-%d", taskType, idx)
 }
 
 type ExampleArgs struct {
@@ -28,9 +38,6 @@ type ExampleReply struct {
 }
 
 // Add your RPC definitions here.
-func ApplyForTask(wordid int, task Task, index int) (Task, int) {
-	// to do
-}
 
 // Cook up a unique-ish UNIX-domain socket name
 // in /var/tmp, for the coordinator.
