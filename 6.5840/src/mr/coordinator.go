@@ -1,7 +1,6 @@
 package mr
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -13,11 +12,12 @@ import (
 
 type Coordinator struct {
 	// Your definitions here.
-	lock           sync.Mutex
-	stage          string
-	nMap           int
-	tasks          map[string]Task
-	availableTasks chan Task
+	lock            sync.Mutex
+	stage           string
+	map_num         int
+	reduce_num      int
+	tasks           map[string]Task
+	available_tasks chan Task
 }
 
 // Your code here -- RPC handlers for the worker to call.
@@ -66,20 +66,16 @@ func (c *Coordinator) Done() bool {
 //
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{
-		stage:          "Map",
-		nMap:           len(files),
-		nReduce:        nReduce,
-		tasks:          make(map[string]Task),
-		availableTasks: make(chan Task, int(len(files))),
+		stage:           "Map",
+		map_num:         len(files),
+		reduce_num:      nReduce,
+		tasks:           make(map[string]Task),
+		available_tasks: make(chan Task, int(len(files))),
 	}
-	for i, file := range files {
-		task := Task{
-			taskType:     "Map",
-			taskid:       i,
-			mapInputFile: file,
-		}
+	for _, file := range files {
+		task := Task{}
 		c.tasks[file] = task
-		c.availableTasks <- task
+		c.available_tasks <- task
 	}
 	log.Println("Coordinator start work")
 
@@ -91,12 +87,8 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 			time.Sleep(500 * time.Millisecond)
 			c.lock.Lock()
 			for _, task := range c.tasks {
-				if task.workerId != "" && time.Now().After(task.deadline) {
-					fmt.Printf("Found timed-out %s task %d previously running on worker %s. Prepare to re-assign",
-						task.taskType, task.taskid, task.workerId)
-				}
-				task.workerId = ""
-				c.availableTasks <- task
+
+				// to do
 			}
 			c.lock.Unlock()
 		}
@@ -104,4 +96,5 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	return &c
 }
 
-func (c *Coordinator) ApplyForTask()
+func (c *Coordinator) ApplyForTask(args *RpcArgs, replys *RpcReply) {
+}

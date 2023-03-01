@@ -5,11 +5,27 @@ import (
 	"hash/fnv"
 	"log"
 	"net/rpc"
+	"os"
 )
 
 //
 // Map functions return a slice of KeyValue.
 //
+type ByKey []KeyValue
+
+// for sorting by key.
+func (a ByKey) Len() int           { return len(a) }
+func (a ByKey) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByKey) Less(i, j int) bool { return a[i].Key < a[j].Key }
+func CreateFile(reduce_id int) *os.File {
+	filename := fmt.Sprintf("mr-out-%d", reduce_id)
+	file_io, ok := os.Create(filename)
+	if ok != nil {
+		log.Fatal("cra")
+	}
+	return file_io
+}
+
 type KeyValue struct {
 	Key   string
 	Value string
@@ -30,9 +46,11 @@ func ihash(key string) int {
 //
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
-
 	// Your worker implementation here.
+	args := RpcArgs{}
+	replys := RpcReply{}
 
+	call("Coordinator.ApplyForTask", &args, &replys)
 	// uncomment to send the Example RPC to the coordinator.
 	// CallExample()
 

@@ -7,10 +7,8 @@ package mr
 //
 
 import (
-	"fmt"
 	"os"
 	"strconv"
-	"time"
 )
 
 //
@@ -18,17 +16,17 @@ import (
 // and reply for an RPC.
 //
 type Task struct {
-	taskType     string
-	taskid       int
-	mapInputFile string
-	workerId     string
-	deadline     time.Time
+	task_type       string
+	file_name       string
+	available_tasks chan Task
 }
 
-func GetTaskUniqueId(taskType string, idx int) string {
-	return fmt.Sprintf("%s-%d", taskType, idx)
+type RpcArgs struct {
+	KeyValue
 }
 
+type RpcReply struct {
+}
 type ExampleArgs struct {
 	X int
 }
