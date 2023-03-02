@@ -19,13 +19,24 @@ type Task struct {
 	task_type       string
 	file_name       string
 	available_tasks chan Task
+	num_reduce      int
+	task_id         int
+	key             string
+	file_names      []string
+	key_files       []key_file
 }
 
 type RpcArgs struct {
-	KeyValue
+	type_request  string
+	task_finished bool
+	task_id       int
+	internal_file map[string][]string
 }
 
 type RpcReply struct {
+	task       Task
+	is_success bool
+	conflict   bool
 }
 type ExampleArgs struct {
 	X int
