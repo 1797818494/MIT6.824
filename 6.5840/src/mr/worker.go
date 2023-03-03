@@ -29,9 +29,9 @@ func CreateFile(reduce_id int) *os.File {
 	return file_io
 }
 
-type key_file struct {
+type Key_file struct {
 	Key   string
-	files []string
+	Files []string
 }
 
 type KeyValue struct {
@@ -54,15 +54,16 @@ func ihash(key string) int {
 //
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
+	log.Println("worker start")
 	// Your worker implementation here.
 	for {
 		args := RpcArgs{
-			task_finished: false,
+			Task_finished: false,
 		}
 		replys := RpcReply{}
 		ok := call("Coordinator.ApplyForTask", &args, &replys)
 		// the position may not be suitable
-		if replys.conflict {
+		if replys.Conflict {
 			log.Fatal("confilct exit")
 			os.Exit(0)
 		}
@@ -70,27 +71,32 @@ func Worker(mapf func(string, string) []KeyValue,
 			log.Fatal("Rpc call failed")
 			os.Exit(0)
 		}
-		if !replys.is_success {
-
+		if !replys.Is_success {
 			os.Exit(0)
 		}
-		if replys.task.task_type == "Map" {
+		if replys.Task.Task_type == "Map" {
 			log.Println("Start Map worker")
 			intermediate := []KeyValue{}
-			file, err := os.Open(replys.task.file_name)
+			file, err := os.Open(replys.Task.File_name)
+			log.Println(replys.Task.File_name)
 			if err != nil {
-				log.Fatalf("cannot open %v", replys.task.task_type)
+				log.Fatalf("cannot open %v\n", replys.Task.Task_type)
 			}
 			content, err := ioutil.ReadAll(file)
 			if err != nil {
-				log.Fatalf("cannot read %v", replys.task.file_name)
+				log.Fatalf("cannot read %v", replys.Task.File_name)
+				os.Exit(0)
 			}
 			file.Close()
-			kva := mapf(replys.task.file_name, string(content))
+			kva := mapf(replys.Task.File_name, string(content))
 			intermediate = append(intermediate, kva...)
 			sort.Sort(ByKey(intermediate))
 			i := 0
-			var key_and_file_name []key_file
+			var key_and_file_name []Key_file
+			log.Println("i max is", len(intermediate))
+			reduce_file_map := make(map[int]bool)
+			reduce_json := make(map[int]*json.Encoder)
+			reduce_file := make(map[int]*os.File)
 			for i < len(intermediate) {
 				j := i + 1
 				for j < len(intermediate) && intermediate[j].Key == intermediate[i].Key {
@@ -101,43 +107,64 @@ func Worker(mapf func(string, string) []KeyValue,
 				for k := i; k < j; k++ {
 					values = append(values, intermediate[k].Value)
 				}
-				reduce_id := ihash(intermediate[i].Key) % replys.task.num_reduce
-				file_name := fmt.Sprintf("mr-%d-%d", replys.task.task_id, reduce_id)
-				file, ok := os.Create(file_name)
-				// to do temp file
-				if ok != nil {
-					log.Fatalln("os Create fatal ", replys.task.task_id)
+				reduce_id := ihash(intermediate[i].Key) % replys.Task.Num_reduce
+				file_name := fmt.Sprintf("mr-%d-%d", replys.Task.Task_id, reduce_id)
+				var file *os.File
+				var ok error
+				if !reduce_file_map[reduce_id] {
+					log.Println("reduce_id ", reduce_id)
+					reduce_file_map[reduce_id] = true
+					// file, ok = os.Create(file_name)
+					file, ok = ioutil.TempFile(".", "*")
+					reduce_file[reduce_id] = file
+					// to do temp file
+					if ok != nil {
+						log.Fatalln("os Create fatal ", replys.Task.Task_id, err)
+					}
+					reduce_json[reduce_id] = json.NewEncoder(file)
 				}
 				files = append(files, file_name)
-				enc := json.NewEncoder(file)
+				//log.Printf("create mr-%d-%d", replys.Task.Task_id, reduce_id)
+				enc := reduce_json[reduce_id]
 				for _, value := range values {
 					err := enc.Encode(&KeyValue{
 						Key:   intermediate[i].Key,
 						Value: value,
 					})
 					if err != nil {
-						log.Fatalln("encode fail")
+						log.Fatalln("encode fail", err)
 					}
 				}
-				append_item := key_file{
+				append_item := Key_file{
 					Key:   intermediate[i].Key,
-					files: files,
+					Files: files,
 				}
 				key_and_file_name = append(key_and_file_name, append_item)
-				file.Close()
 				i = j
+			}
+			for reduce_this_id, is_true := range reduce_file_map {
+				if is_true {
+					reduce_file[reduce_this_id].Close()
+				}
 			}
 			internal_files := make(map[string][]string)
 			for _, this_kv := range key_and_file_name {
 				key := this_kv.Key
-				files := this_kv.files
+				files := this_kv.Files
 				internal_files[key] = append(internal_files[key], files...)
 			}
-			args := RpcArgs{
-				type_request:  "Map",
-				task_finished: true,
-				internal_file: internal_files,
+			for my_reduce_id, file_io := range reduce_file {
+				s := fmt.Sprintf("./mr-%d-%d", replys.Task.Task_id, my_reduce_id)
+				log.Println(s)
+				os.Rename(file_io.Name(), s)
 			}
+			args := RpcArgs{
+				Type_request:  "Map",
+				Task_finished: true,
+				Task_id:       replys.Task.Task_id,
+				Internal_file: internal_files,
+			}
+			// rename the file
 			replys := RpcReply{}
 			ok := call("Coordinator.ApplyForTask", &args, &replys)
 			if !ok {
@@ -148,63 +175,67 @@ func Worker(mapf func(string, string) []KeyValue,
 			continue
 
 		}
-		if replys.task.task_type == "Reduce" {
+		if replys.Task.Task_type == "Reduce" {
 			log.Println("Start Reduce worker")
 			var err error
 			var file_io *os.File
 			defer file_io.Close()
-			for i, this_kv := range replys.task.key_files {
-				var values []string
-				Key := this_kv.Key
-				file_names := this_kv.files
-				for _, file := range file_names {
-					file_io, err := os.Open(file)
-					if err != nil {
-						log.Fatalln("open fail")
-					}
-					dec := json.NewDecoder(file_io)
-					for {
-						var kv KeyValue
-						if err := dec.Decode(&kv); err != nil {
-							break
-						}
-						if Key == kv.Key {
-							values = append(values, kv.Value)
-						}
-					}
-				}
-				if i == 0 {
-					reduce_id := ihash(Key) % replys.task.num_reduce
-					file_name := fmt.Sprintf("mr-out%d", reduce_id)
-					file_io, err = os.Create(file_name)
-					if err != nil {
-						log.Fatalln("create file fail")
-					}
-				}
-				result := reducef(Key, values)
-				enc := json.NewEncoder(file_io)
-				result_kv := KeyValue{
-					Key:   Key,
-					Value: result,
-				}
-				enc.Encode(&result_kv)
+			reduce_map := replys.Task.Files_set
+			Key_Value := make(map[string][]string)
+			reduce_id := replys.Task.Task_id
+			// file_name := fmt.Sprintf("mr-out-%d", reduce_id)
+			file_io, err = ioutil.TempFile(".", "*")
+			// file_io, err = os.Create(file_name)
+			if err != nil {
+				log.Fatalln("create file fail")
 			}
+			log.Println("reduce mr-out succeed", reduce_id)
+			for file, _ := range reduce_map.Files {
+				// log.Println(file_names)
+				file_io, err := os.Open(file)
+				if err != nil {
+					log.Fatalln("open fail")
+				}
+				dec := json.NewDecoder(file_io)
+				for {
+					var kv KeyValue
+					if err := dec.Decode(&kv); err != nil {
+						break
+					}
+					if reduce_map.Key[kv.Key] {
+						Key_Value[kv.Key] = append(Key_Value[kv.Key], kv.Value)
+					}
+				}
+			}
+			for Key, Value := range Key_Value {
+				result := reducef(Key, Value)
+				fmt.Fprintf(file_io, "%v %v\n", Key, result)
+			}
+			// log.Println(Key, "+", values)
+			// enc := json.NewEncoder(file_io)
+			// result_kv := KeyValue{
+			// 	Key:   Key,
+			// 	Value: result,
+			// }
+			// enc.Encode(&result_kv)
+			return_args := RpcArgs{
+				Type_request:  "Reduce",
+				Task_finished: true,
+				Task_id:       replys.Task.Task_id,
+			}
+			log.Println("reduce finish")
+			return_replys := RpcReply{}
+			os.Rename(file_io.Name(), fmt.Sprintf("./mr-out-%d", reduce_id))
+			ok1 := call("Coordinator.ApplyForTask", &return_args, &return_replys)
+			if !ok1 {
+				log.Fatalln("rpc fail when Reduce finish")
+				os.Exit(0)
+			}
+			log.Println("Reducer worker reply the master")
+			// uncomment to send the Example RPC to the coordinator.
+			// CallExample()
+			continue
 		}
-		return_args := RpcArgs{
-			type_request:  "Reduce",
-			task_finished: true,
-			task_id:       replys.task.task_id,
-		}
-		return_replys := RpcReply{}
-		ok1 := call("Coordinator.ApplyForTask", &return_args, &return_replys)
-		if !ok1 {
-			log.Fatalln("rpc fail when Reduce finish")
-			os.Exit(0)
-		}
-		log.Println("Reducer worker reply the master")
-		// uncomment to send the Example RPC to the coordinator.
-		// CallExample()
-		continue
 	}
 
 }

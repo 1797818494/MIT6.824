@@ -16,27 +16,27 @@ import (
 // and reply for an RPC.
 //
 type Task struct {
-	task_type       string
-	file_name       string
-	available_tasks chan Task
-	num_reduce      int
-	task_id         int
-	key             string
-	file_names      []string
-	key_files       []key_file
+	Task_type       string
+	File_name       string
+	Available_tasks chan Task
+	Num_reduce      int
+	Task_id         int
+	Key             string
+	Files_set       Key_and_files_set
+	IsPush          bool
 }
 
 type RpcArgs struct {
-	type_request  string
-	task_finished bool
-	task_id       int
-	internal_file map[string][]string
+	Type_request  string
+	Task_finished bool
+	Task_id       int
+	Internal_file map[string][]string
 }
 
 type RpcReply struct {
-	task       Task
-	is_success bool
-	conflict   bool
+	Task       Task
+	Is_success bool
+	Conflict   bool
 }
 type ExampleArgs struct {
 	X int
