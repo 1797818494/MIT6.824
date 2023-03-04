@@ -18,7 +18,8 @@ type Coordinator struct {
 	Reduce_num                int
 	Tasks                     map[string]Task
 	Internal_file             map[string][]string
-	Available_tasks           chan Task
+	Map_tasks_chan            chan Task
+	Reduce_tasks_chan         chan Task
 	Task_finished_map         map[int]bool
 	Task_finished_num         int
 	Finished_reducce_task     map[int]bool
@@ -90,7 +91,8 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 		Reduce_num:                nReduce,
 		Tasks:                     make(map[string]Task),
 		Internal_file:             make(map[string][]string),
-		Available_tasks:           make(chan Task, int(len(files))),
+		Map_tasks_chan:            make(chan Task, int(len(files))),
+		Reduce_tasks_chan:         make(chan Task, nReduce),
 		Task_finished_map:         make(map[int]bool),
 		Task_finished_num:         0,
 		Finished_reducce_task:     make(map[int]bool),
@@ -107,10 +109,10 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 			File_name:  file,
 			Task_id:    i,
 			Num_reduce: c.Reduce_num,
+			IsPush:     false,
 		}
-		c.Map_Task[i] = task
-		c.Tasks[file] = task
-		c.Available_tasks <- task
+		// c.Map_Task[i] = task
+		c.Map_tasks_chan <- task
 	}
 	log.Println("start server")
 
@@ -130,14 +132,20 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 			for id, this_time := range c.Map_timer {
 				if c.Map_Task[id].IsPush && !c.Task_finished_map[id] && time.Now().After(this_time.Add(10*time.Second)) {
 					log.Println("the map is crash!!!!!!!!!")
-					c.Available_tasks <- c.Map_Task[id]
+					c.Lock.Unlock()
+					c.Map_tasks_chan <- c.Map_Task[id]
+					c.Lock.Lock()
 					delete(c.Map_Task, id)
 				}
 			}
+			log.Println(c.Reduce_timer)
 			for id, this_time := range c.Reduce_timer {
+				log.Println(c.Reduce_Task[id].IsPush, c.Finished_reducce_task[id])
 				if c.Reduce_Task[id].IsPush && !c.Finished_reducce_task[id] && time.Now().After(this_time.Add(10*time.Second)) {
-					log.Println("the reduce is crash!!!!!!!!!")
-					c.Available_tasks <- c.Reduce_Task[id]
+					log.Println("the reduce is crash!!!!!!!!!", id)
+					c.Lock.Unlock()
+					c.Reduce_tasks_chan <- c.Reduce_Task[id]
+					c.Lock.Lock()
 					delete(c.Reduce_Task, id)
 				}
 			}
@@ -167,18 +175,20 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 				for i, Key_and_files := range map_reduce_bucket {
 					log.Println("reduce task produce ", i)
 					// log.Println(this_key_file)
-					c.Available_tasks <- Task{
+					c.Reduce_tasks_chan <- Task{
 						Task_type:  "Reduce",
 						Num_reduce: c.Reduce_num,
 						Task_id:    i,
 						Files_set:  Key_and_files,
+						IsPush:     false,
 					}
-					c.Reduce_Task[i] = Task{
-						Task_type:  "Reduce",
-						Num_reduce: c.Reduce_num,
-						Task_id:    i,
-						Files_set:  Key_and_files,
-					}
+					// c.Reduce_Task[i] = Task{
+					// 	Task_type:  "Reduce",
+					// 	Num_reduce: c.Reduce_num,
+					// 	Task_id:    i,
+					// 	Files_set:  Key_and_files,
+					// 	IsPush:     true,
+					// }
 				}
 				c.Lock.Unlock()
 				break
@@ -199,13 +209,14 @@ func (c *Coordinator) ApplyForTask(args *RpcArgs, replys *RpcReply) error {
 		if args.Type_request != c.Stage || (c.Stage == "Map" && c.Task_finished_map[args.Task_id]) || (c.Stage == "Reduce" && c.Finished_reducce_task[args.Task_id]) {
 			log.Println("the stage and task conflict")
 			replys.Conflict = true
+			c.Lock.Unlock()
 			return nil
 		}
 		// map task finish, update the state
 		if args.Type_request == "Map" {
 			c.Task_finished_map[args.Task_id] = true
 			c.Task_finished_num++
-			log.Println("task num and map num", c.Task_finished_num, c.Map_num)
+			log.Println("task num and map num", c.Task_finished_num, c.Map_num, args.Task_id)
 			for key, files := range args.Internal_file {
 				// log.Println(files)
 				c.Internal_file[key] = append(c.Internal_file[key], files...)
@@ -221,7 +232,7 @@ func (c *Coordinator) ApplyForTask(args *RpcArgs, replys *RpcReply) error {
 		if args.Type_request == "Reduce" {
 			c.Finished_reducce_task[args.Task_id] = true
 			c.Finished_reducce_task_num++
-			log.Println("reduce finished task", c.Finished_reducce_task_num)
+			log.Println("reduce finished task", c.Finished_reducce_task_num, args.Task_id)
 			c.Lock.Unlock()
 			return nil
 		}
@@ -231,7 +242,13 @@ func (c *Coordinator) ApplyForTask(args *RpcArgs, replys *RpcReply) error {
 			replys.Task.Task_type = "Map"
 			c.Lock.Unlock()
 			log.Println("the block is ", c.Task_finished_num)
-			replys.Task = <-c.Available_tasks
+			select {
+			case replys.Task = <-c.Map_tasks_chan:
+			case <-time.After(10 * time.Second): // 超时10秒没有获得数据，则退出程序，如果只是退出循环，可以return改为continue
+				log.Println("Map !! More than 10 second no input, return!!!!!!!!!")
+				replys.Conflict = true
+				return nil
+			}
 			log.Println("here1")
 			c.Lock.Lock()
 			log.Println("reach here")
@@ -248,11 +265,22 @@ func (c *Coordinator) ApplyForTask(args *RpcArgs, replys *RpcReply) error {
 			log.Println("Reduce dispatch")
 			replys.Task.Task_type = "Reduce"
 			c.Lock.Unlock()
-			replys.Task = <-c.Available_tasks
+			select {
+			case replys.Task = <-c.Reduce_tasks_chan:
+			case <-time.After(10 * time.Second): // 超时10秒没有获得数据，则退出程序，如果只是退出循环，可以return改为continue
+				log.Println("More than 10 second no input, return!!!!!!!!!")
+				replys.Conflict = true
+				return nil
+			}
+
+			log.Println("here1!")
 			c.Lock.Lock()
-			c.Reduce_timer[replys.Task.Task_id] = time.Now()
+			log.Println("reach here!!")
+			log.Println("here is task id", replys.Task.Task_id)
 			replys.Task.IsPush = true
+			c.Reduce_timer[replys.Task.Task_id] = time.Now()
 			c.Reduce_Task[replys.Task.Task_id] = replys.Task
+			log.Println("the finished block is ", c.Finished_reducce_task_num)
 			c.Lock.Unlock()
 			replys.Is_success = true
 			return nil

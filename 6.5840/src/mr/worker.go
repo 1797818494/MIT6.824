@@ -9,6 +9,7 @@ import (
 	"net/rpc"
 	"os"
 	"sort"
+	"time"
 )
 
 //
@@ -64,14 +65,15 @@ func Worker(mapf func(string, string) []KeyValue,
 		ok := call("Coordinator.ApplyForTask", &args, &replys)
 		// the position may not be suitable
 		if replys.Conflict {
-			log.Fatal("confilct exit")
-			os.Exit(0)
+			log.Println("confilct continue")
+			continue
 		}
 		if !ok {
 			log.Fatal("Rpc call failed")
 			os.Exit(0)
 		}
 		if !replys.Is_success {
+			log.Println("reply is not success")
 			os.Exit(0)
 		}
 		if replys.Task.Task_type == "Map" {
@@ -172,6 +174,7 @@ func Worker(mapf func(string, string) []KeyValue,
 				os.Exit(0)
 			}
 			log.Println("map worker reply the master")
+			time.Sleep(800 * time.Millisecond)
 			continue
 
 		}
@@ -191,7 +194,7 @@ func Worker(mapf func(string, string) []KeyValue,
 			}
 			log.Println("reduce mr-out succeed", reduce_id)
 			for file, _ := range reduce_map.Files {
-				// log.Println(file_names)
+				//log.Println(file)
 				file_io, err := os.Open(file)
 				if err != nil {
 					log.Fatalln("open fail")
@@ -202,13 +205,17 @@ func Worker(mapf func(string, string) []KeyValue,
 					if err := dec.Decode(&kv); err != nil {
 						break
 					}
+					// log.Println("file key is", kv.Key)
 					if reduce_map.Key[kv.Key] {
 						Key_Value[kv.Key] = append(Key_Value[kv.Key], kv.Value)
 					}
 				}
 			}
 			for Key, Value := range Key_Value {
+				//log.Println(Key, Value)
+				log.Println(reducef("c", []string{"1", "1", "1", "1", "1"}))
 				result := reducef(Key, Value)
+				log.Println(Key, result)
 				fmt.Fprintf(file_io, "%v %v\n", Key, result)
 			}
 			// log.Println(Key, "+", values)
@@ -218,6 +225,8 @@ func Worker(mapf func(string, string) []KeyValue,
 			// 	Value: result,
 			// }
 			// enc.Encode(&result_kv)
+			log.Println("the reduce rename !!!!  ", reduce_id)
+			os.Rename(file_io.Name(), fmt.Sprintf("./mr-out-%d", reduce_id))
 			return_args := RpcArgs{
 				Type_request:  "Reduce",
 				Task_finished: true,
@@ -225,7 +234,6 @@ func Worker(mapf func(string, string) []KeyValue,
 			}
 			log.Println("reduce finish")
 			return_replys := RpcReply{}
-			os.Rename(file_io.Name(), fmt.Sprintf("./mr-out-%d", reduce_id))
 			ok1 := call("Coordinator.ApplyForTask", &return_args, &return_replys)
 			if !ok1 {
 				log.Fatalln("rpc fail when Reduce finish")
@@ -234,6 +242,7 @@ func Worker(mapf func(string, string) []KeyValue,
 			log.Println("Reducer worker reply the master")
 			// uncomment to send the Example RPC to the coordinator.
 			// CallExample()
+			time.Sleep(800 * time.Millisecond)
 			continue
 		}
 	}
