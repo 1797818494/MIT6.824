@@ -41,6 +41,7 @@ import (
 type LogEntry struct {
 	Command  interface{}
 	Log_Term int
+	Index    int
 }
 type ApplyMsg struct {
 	CommandValid bool
@@ -77,8 +78,12 @@ type Raft struct {
 	Committed_Idx    int
 	Last_Applied_Idx int
 	// leader violate and should reinitilize in the start of vote
-	Next_Idx  []int
-	Match_Idx []int
+	Next_Idx         []int
+	Match_Idx        []int
+	HeartBeatTimeOut *time.Timer
+	ElectionTimeOut  *time.Timer
+	HeartTime        int
+	ElectTime        int
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
 
@@ -166,16 +171,30 @@ type RequestVoteReply struct {
 // example RequestVote RPC handler.
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
-	log.Println("Rpc requestVote start")
+	log.Println("Rpc requestVote start ", rf.me)
+	rf.mu.Lock()
+	log.Println("Rpc get lock", rf.me)
+	defer rf.mu.Unlock()
 	reply.Vote_Granted = false
-	if rf.CurrentTerm > args.Candidate_Curr_Term {
+	if rf.CurrentTerm > args.Candidate_Curr_Term || (rf.CurrentTerm == args.Candidate_Curr_Term && rf.VoteFor != -1 && rf.VoteFor != args.Candidate_Id) {
+		reply.Current_Term = rf.CurrentTerm
 		reply.Vote_Granted = false
+		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
 		return
 	}
-	// -1 stand for null
-	if rf.VoteFor == -1 {
-		reply.Vote_Granted = true
+	if args.Candidate_Curr_Term > rf.CurrentTerm {
+		log.Println("request is higer!!!!")
+		rf.ToFollower()
+		rf.VoteFor = -1
+		rf.CurrentTerm = args.Candidate_Curr_Term
 	}
+	// -1 stand for null
+
+	rf.VoteFor = args.Candidate_Id
+	reply.Current_Term = rf.CurrentTerm
+	log.Println(args.Candidate_Id, " vote grand ", rf.me)
+	rf.ResetElection()
+	reply.Vote_Granted = true
 	// TODO: term is used for the candidate to update itself
 
 }
@@ -208,8 +227,8 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 // that the caller passes the address of the reply struct with &, not
 // the struct itself.
 func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *RequestVoteReply) bool {
-	args.Candidate_Curr_Term = rf.CurrentTerm
-	args.Candidate_Id = rf.me
+	// args.Candidate_Curr_Term = rf.CurrentTerm
+	// args.Candidate_Id = rf.me
 	// TODO: Add the last_log_term and idx
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
 	return ok
@@ -256,20 +275,98 @@ func (rf *Raft) killed() bool {
 	return z == 1
 }
 
-func (rf *Raft) ticker() {
-	for rf.killed() == false {
+func (rf *Raft) ResetElection() {
+	election_time := 500 + (rand.Int63() % 500)
+	rf.ElectionTimeOut.Reset(time.Duration(election_time) * time.Millisecond)
+}
+func (rf *Raft) StartHeart() {
+	args := AppendArgs{
+		Leader_Term: rf.CurrentTerm,
+		Leader_Id:   rf.me,
+		// PrevLogTerm:   rf.Log_Array[rf.Next_Idx[idx]].Log_Term,
+		// PrevLogIndex:  rf.Next_Idx[idx],
+		Entries:       rf.Log_Array,
+		Leader_Commit: rf.Committed_Idx,
+	}
+	for i := range rf.peers {
+		if i != rf.me {
+			// pre_idx := rf.Next_Idx[i]
+			go func(idx int) {
+				rf.mu.Lock()
+				if rf.Raft_Status != Leader {
+					rf.mu.Unlock()
+					return
+				}
+				rf.mu.Unlock()
+				reply := AppendReply{}
+				if rf.SendAppendEntries(idx, &args, &reply) {
+					rf.mu.Lock()
+					defer rf.mu.Unlock()
+					if !reply.Success {
+						log.Println("find the leadr and change state to follower")
+						rf.ToFollower()
+						rf.CurrentTerm, rf.VoteFor = reply.Term, -1
+					} else {
+						rf.ResetElection()
+					}
+					// if reply.Success {
+					// 	log.Println("append success", idx)
+					// 	rf.Next_Idx[idx] = len(rf.Log_Array) - 1
+					// 	return
+					// }
+					// // pre_idx == 0的情况
+					// //变化为term中最后一个
+					// if pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
+					// 	for pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
+					// 		pre_idx--
+					// 	}
+					// } else {
+					// 	//已经是term最后一个直接，进入下一个
+					// 	pre_idx--
+					// }
+					// rf.Next_Idx[idx] = pre_idx
+				} else {
+					log.Println("rpc append failed")
+				}
+			}(i)
+		}
+	}
+}
 
+func (rf *Raft) ticker() {
+	for !rf.killed() {
+		select {
+		case <-rf.ElectionTimeOut.C:
+			{
+				rf.mu.Lock()
+				// 开始新的选举
+				log.Println("state is ", rf.Raft_Status)
+				log.Println(rf.me, " start to try to get votes")
+				rf.CandidateAction()
+				// 重设置计时器
+				rf.ResetElection()
+				rf.mu.Unlock()
+			}
+		case <-rf.HeartBeatTimeOut.C:
+			{
+				rf.mu.Lock()
+				if rf.Raft_Status == Leader {
+					log.Println(rf.me, " start heart beat")
+					// 开始心跳监测
+					rf.StartHeart()
+					rf.HeartBeatTimeOut.Reset(time.Duration(rf.HeartTime) * time.Millisecond)
+				}
+				rf.mu.Unlock()
+			}
+		}
 		// Your code here (2A)
 		// Check if a leader election should be started.
-		if rf.Raft_Status == Leader {
-			continue
-		}
 		// TODO:
 
 		// pause for a random amount of time between 50 and 350
 		// milliseconds.
-		ms := 50 + (rand.Int63() % 300)
-		time.Sleep(time.Duration(ms) * time.Millisecond)
+		// ms := 50 + (rand.Int63() % 300)
+		// time.Sleep(time.Duration(ms) * time.Millisecond)
 	}
 }
 
@@ -284,6 +381,7 @@ func (rf *Raft) ticker() {
 // for any long-running work.
 func Make(peers []*labrpc.ClientEnd, me int,
 	persister *Persister, applyCh chan ApplyMsg) *Raft {
+	log.Println("the new raft is ", me)
 	rf := &Raft{}
 	rf.peers = peers
 	rf.persister = persister
@@ -295,6 +393,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.Raft_Status = Follower
 	rf.Committed_Idx = 0
 	rf.Last_Applied_Idx = 0
+	rf.HeartTime = 100
+	rf.HeartBeatTimeOut = time.NewTimer(time.Duration(rf.HeartTime) * time.Millisecond)
+	rf.ElectTime = 500 + rand.Int()%500
+	rf.ElectionTimeOut = time.NewTimer(time.Duration(rf.ElectTime) * time.Millisecond)
 	// rf.Match_Idx
 	// rf.Next_Idx
 	// TODO:
@@ -322,21 +424,120 @@ type AppendReply struct {
 }
 
 func (rf *Raft) SendAppendEntries(server int, args *AppendArgs, reply *AppendReply) bool {
-	args.Leader_Term = rf.CurrentTerm
-	args.Leader_Id = rf.me
+	// args.Leader_Term = rf.CurrentTerm
+	// args.Leader_Id = rf.me
 	// TODO:
 	// args.PrevLogIndex
 	// args.PrevLogTerm
-	args.Leader_Commit = rf.Committed_Idx
-	args.Entries = rf.Log_Array
-
+	// args.Leader_Commit = rf.Committed_Idx
+	// args.Entries = rf.Log_Array
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	return ok
 }
 
-func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
-	if args.Leader_Term < rf.CurrentTerm {
-		reply.Success = false
+func (rf *Raft) CandidateAction() {
+	log.Println("start candidate")
+	rf.Raft_Status = Candidate
+	rf.CurrentTerm++
+	log.Println(rf.CurrentTerm)
+	rf.VoteFor = rf.me
+	log.Println("candidate start get vote and vote itself")
+	vote_cnt := 1
+	// var wg sync.WaitGroup
+	// wg.Add(len(rf.peers) - 1)
+	args := RequestVoteArgs{
+		Candidate_Curr_Term: rf.CurrentTerm,
+		Candidate_Id:        rf.me,
+		// Last_Log_Index:      last_idx,
+		// Last_Log_Term: rf.Log_Array[last_idx].Log_Term,
 	}
+	for i := range rf.peers {
+		if i != rf.me {
+			//last_idx := len(rf.Log_Array) - 1
+			go func(idx int) {
+				rf.mu.Lock()
+				if rf.Raft_Status != Candidate {
+					rf.mu.Unlock()
+					return
+				}
+				rf.mu.Unlock()
+				reply := RequestVoteReply{}
+				if rf.sendRequestVote(idx, &args, &reply) {
+					rf.mu.Lock()
+					defer rf.mu.Unlock()
+					log.Println(rf.me, "send the rpc to the ", idx)
+					// to do
+					if rf.CurrentTerm == args.Candidate_Curr_Term && rf.Raft_Status == Candidate {
+						log.Println("pos here")
+						if reply.Vote_Granted {
+							vote_cnt++
+							log.Println(rf.me, "get vote numver is", vote_cnt)
+							if vote_cnt > len(rf.peers)/2 {
+								rf.ToLeader()
+								rf.StartHeart()
+								log.Println("heart sync finish, change ", rf.me, " to leader")
+							}
+						} else if reply.Current_Term > rf.CurrentTerm {
+							log.Println("the leader to follower ", rf.me)
+							rf.ToFollower()
+							rf.CurrentTerm, rf.VoteFor = reply.Current_Term, -1
+						}
+					}
+				} else {
+					log.Println("rpc fail vote")
+				}
+				// wg.Done()
+			}(i)
+			// 并行发送到其他所以机器上投票
+
+		}
+	}
+}
+func (rf *Raft) ToLeader() {
+	log.Println(rf.me, " to Leader")
+	rf.Raft_Status = Leader
+}
+func (rf *Raft) ToFollower() {
+	log.Println(rf.me, " to follower")
+	rf.Raft_Status = Follower
+}
+func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
+	log.Println("append ", rf.me)
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	if args.Leader_Term < rf.CurrentTerm {
+		reply.Term = rf.CurrentTerm
+		reply.Success = false
+		return
+	}
+	if args.Leader_Term > rf.CurrentTerm {
+		rf.CurrentTerm, rf.VoteFor = args.Leader_Term, -1
+	}
+	// flag := false
+	// for idx, entry := range rf.Log_Array {
+	// 	if entry.Log_Term == args.PrevLogTerm && idx == args.PrevLogIndex {
+	// 		flag = true
+	// 		break
+	// 	}
+	// }
+	// if !flag {
+	// 	reply.Success = false
+	// 	return
+	// }
+	// // 以上是为了参与者和自己的日志相同，如果不是则拒绝
+	// // 确认一致的最后一条日志，然后删除这条之后的，再添加
+	// if len(rf.Log_Array) > args.PrevLogIndex && rf.Log_Array[args.PrevLogIndex].Log_Term == args.PrevLogTerm {
+	// 	rf.Log_Array = rf.Log_Array[:args.PrevLogIndex+1]
+	// }
+	// // to d
+	// rf.Log_Array = append(rf.Log_Array, args.Entries[args.PrevLogIndex+1:]...)
+	// if args.Leader_Commit > rf.Committed_Idx {
+	// 	rf.Committed_Idx = int(math.Min(float64(args.Leader_Commit), float64(len(rf.Log_Array))))
+	// }
+	rf.ToFollower()
+	rf.ResetElection()
+	rf.CurrentTerm = args.Leader_Term
+	reply.Success = true
 	//TODO:2,3,4,5 in the paper
+
 }
