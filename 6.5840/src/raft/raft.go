@@ -80,8 +80,8 @@ type Raft struct {
 	// leader violate and should reinitilize in the start of vote
 	Next_Idx         []int
 	Match_Idx        []int
-	HeartBeatTimeOut *time.Timer
-	ElectionTimeOut  *time.Timer
+	HeartBeatTimeOut time.Time
+	ElectionTimeOut  time.Time
 	HeartTime        int
 	ElectTime        int
 	// Look at the paper's Figure 2 for a description of what
@@ -276,8 +276,16 @@ func (rf *Raft) killed() bool {
 }
 
 func (rf *Raft) ResetElection() {
-	election_time := 500 + (rand.Int63() % 500)
-	rf.ElectionTimeOut.Reset(time.Duration(election_time) * time.Millisecond)
+	rf.ElectionTimeOut = time.Now()
+	rf.ElectTime = 500 + rand.Int()%500
+
+}
+func (rf *Raft) ElectionIfOut() bool {
+	if rf.Raft_Status == Leader {
+		return false
+	}
+	log.Println(rf.me, " ...... ", time.Now(), rf.ElectionTimeOut.Add(time.Millisecond*time.Duration(rf.ElectTime)))
+	return time.Now().After(rf.ElectionTimeOut.Add(time.Millisecond * time.Duration(rf.ElectTime)))
 }
 func (rf *Raft) StartHeart() {
 	args := AppendArgs{
@@ -306,8 +314,6 @@ func (rf *Raft) StartHeart() {
 						log.Println("find the leadr and change state to follower")
 						rf.ToFollower()
 						rf.CurrentTerm, rf.VoteFor = reply.Term, -1
-					} else {
-						rf.ResetElection()
 					}
 					// if reply.Success {
 					// 	log.Println("append success", idx)
@@ -335,38 +341,54 @@ func (rf *Raft) StartHeart() {
 
 func (rf *Raft) ticker() {
 	for !rf.killed() {
-		select {
-		case <-rf.ElectionTimeOut.C:
-			{
-				rf.mu.Lock()
-				// 开始新的选举
-				log.Println("state is ", rf.Raft_Status)
-				log.Println(rf.me, " start to try to get votes")
-				rf.CandidateAction()
-				// 重设置计时器
-				rf.ResetElection()
-				rf.mu.Unlock()
-			}
-		case <-rf.HeartBeatTimeOut.C:
-			{
-				rf.mu.Lock()
-				if rf.Raft_Status == Leader {
-					log.Println(rf.me, " start heart beat")
-					// 开始心跳监测
-					rf.StartHeart()
-					rf.HeartBeatTimeOut.Reset(time.Duration(rf.HeartTime) * time.Millisecond)
-				}
-				rf.mu.Unlock()
-			}
+		rf.mu.Lock()
+		log.Println(time.Now())
+		if rf.ElectionIfOut() {
+			// 开始新的选举
+			log.Println("candidate start .......", rf.me)
+			log.Println("state is ", rf.Raft_Status)
+			log.Println(rf.me, " start to try to get votes")
+			rf.CandidateAction()
+			// 重设置计时器
+			rf.ResetElection()
 		}
+		rf.mu.Unlock()
 		// Your code here (2A)
 		// Check if a leader election should be started.
 		// TODO:
 
 		// pause for a random amount of time between 50 and 350
 		// milliseconds.
-		// ms := 50 + (rand.Int63() % 300)
-		// time.Sleep(time.Duration(ms) * time.Millisecond)
+		ms := 50 + (rand.Int63() % 300)
+		time.Sleep(time.Duration(ms) * time.Millisecond)
+	}
+}
+func (rf *Raft) HeartReset() {
+	rf.HeartBeatTimeOut = time.Now()
+}
+func (rf *Raft) HeartIfOut() bool {
+	return time.Now().After(rf.HeartBeatTimeOut.Add(time.Duration(rf.HeartTime) * time.Millisecond))
+}
+func (rf *Raft) Heart() {
+	for !rf.killed() {
+		rf.mu.Lock()
+		if rf.HeartIfOut() {
+			if rf.Raft_Status == Leader {
+				log.Println(rf.me, " start heart beat")
+				// 开始心跳监测
+				rf.StartHeart()
+				rf.HeartReset()
+			}
+		}
+		rf.mu.Unlock()
+		// Your code here (2A)
+		// Check if a leader election should be started.
+		// TODO:
+
+		// pause for a random amount of time between 50 and 350
+		// milliseconds.
+		ms := 30 + (rand.Int63() % 5)
+		time.Sleep(time.Duration(ms) * time.Millisecond)
 	}
 }
 
@@ -394,9 +416,9 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.Committed_Idx = 0
 	rf.Last_Applied_Idx = 0
 	rf.HeartTime = 100
-	rf.HeartBeatTimeOut = time.NewTimer(time.Duration(rf.HeartTime) * time.Millisecond)
+	rf.HeartBeatTimeOut = time.Now()
 	rf.ElectTime = 500 + rand.Int()%500
-	rf.ElectionTimeOut = time.NewTimer(time.Duration(rf.ElectTime) * time.Millisecond)
+	rf.ElectionTimeOut = time.Now()
 	// rf.Match_Idx
 	// rf.Next_Idx
 	// TODO:
@@ -405,6 +427,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
+	go rf.Heart()
 
 	return rf
 }
@@ -502,8 +525,8 @@ func (rf *Raft) ToFollower() {
 	rf.Raft_Status = Follower
 }
 func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
-	log.Println("append ", rf.me)
 	rf.mu.Lock()
+	log.Println("append ", rf.me)
 	defer rf.mu.Unlock()
 	if args.Leader_Term < rf.CurrentTerm {
 		reply.Term = rf.CurrentTerm
@@ -535,6 +558,7 @@ func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 	// 	rf.Committed_Idx = int(math.Min(float64(args.Leader_Commit), float64(len(rf.Log_Array))))
 	// }
 	rf.ToFollower()
+	log.Println("append success", rf.me, "  ", time.Now())
 	rf.ResetElection()
 	rf.CurrentTerm = args.Leader_Term
 	reply.Success = true
