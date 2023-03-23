@@ -19,7 +19,9 @@ package raft
 
 import (
 	//	"bytes"
+
 	"log"
+	"math"
 	"math/rand"
 	"sync"
 	"sync/atomic"
@@ -76,6 +78,7 @@ type Raft struct {
 	VoteFor          int
 	Log_Array        []LogEntry
 	Committed_Idx    int
+	ApplyChan        chan ApplyMsg
 	Last_Applied_Idx int
 	// leader violate and should reinitilize in the start of vote
 	Next_Idx         []int
@@ -84,9 +87,10 @@ type Raft struct {
 	ElectionTimeOut  time.Time
 	HeartTime        int
 	ElectTime        int
+	ApplyCond        sync.Cond
+	ReplicatorCond   []*sync.Cond
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
-
 }
 
 // return currentTerm and whether this server
@@ -182,6 +186,19 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
 		return
 	}
+	// election limitation
+	if args.Last_Log_Term < rf.Log_Array[len(rf.Log_Array)-1].Log_Term {
+		reply.Current_Term = rf.CurrentTerm
+		reply.Vote_Granted = false
+		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
+		return
+	}
+	if args.Last_Log_Term == rf.Log_Array[len(rf.Log_Array)-1].Log_Term && args.Last_Log_Index < len(rf.Log_Array)-1 {
+		reply.Current_Term = rf.CurrentTerm
+		reply.Vote_Granted = false
+		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
+		return
+	}
 	if args.Candidate_Curr_Term > rf.CurrentTerm {
 		log.Println("request is higer!!!!")
 		rf.ToFollower()
@@ -246,11 +263,159 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 // if it's ever committed. the second return value is the current
 // term. the third return value is true if this server believes it is
 // the leader.
-func (rf *Raft) Start(command interface{}) (int, int, bool) {
-	index := -1
-	term := -1
-	isLeader := true
+func (rf *Raft) AppendNewEntries(command interface{}) LogEntry {
+	new_entries := LogEntry{Command: command, Log_Term: rf.CurrentTerm, Index: len(rf.Log_Array)}
+	rf.Log_Array = append(rf.Log_Array, new_entries)
+	rf.Log_Array[len(rf.Log_Array)-1].Index = len(rf.Log_Array) - 1
+	for i := range rf.peers {
+		rf.Match_Idx[i] = rf.Committed_Idx
+		rf.Next_Idx[i] = len(rf.Log_Array) - 1
+	}
+	return new_entries
 
+}
+func (rf *Raft) GetFirstLog() LogEntry {
+	// to do
+	return rf.Log_Array[0]
+}
+func (rf *Raft) replicateOneRound(peer int) {
+	rf.mu.Lock()
+	if rf.Raft_Status != Leader {
+		rf.mu.Unlock()
+		return
+	}
+	prevLogIndex := rf.Next_Idx[peer] - 1
+	if prevLogIndex < 0 {
+		DPrintf("Node{%v}'s to peer{%v} prevLogIndex{%v} to 0", rf.me, peer, prevLogIndex)
+		prevLogIndex = 0
+	}
+
+	if prevLogIndex == -1 {
+		log.Fatal("the unpossible branch")
+	} else {
+		request := rf.produceAppendRequest(prevLogIndex)
+		rf.mu.Unlock()
+
+		reply := AppendReply{}
+		if rf.SendAppendEntries(peer, &request, &reply) {
+			rf.mu.Lock()
+			rf.processAppendReply(peer, request, reply)
+			rf.mu.Unlock()
+		} else {
+			DPrintf("Leader Node{%v} to Node {%v} append rpc failed ", rf.me, peer)
+		}
+	}
+}
+
+func (rf *Raft) processAppendReply(peer int, args AppendArgs, reply AppendReply) {
+	if reply.PrevLogIndex != rf.Next_Idx[peer]-1 {
+		log.Printf("rpc order delay")
+		return
+	}
+	if !reply.Success && reply.Term == args.Leader_Term {
+		//日志不一致失败，减少next_id重试
+		rf.Next_Idx[peer] = rf.GetIdxPreTerm(rf.Next_Idx[peer] - 1)
+		log.Printf("Node{%v}'s next_idx become{%v}", rf.me, rf.Next_Idx[peer])
+		return
+	}
+	//发现更大term的candidate, 转变为follwer
+	if !reply.Success && reply.Term > args.Leader_Term {
+		log.Println("find the leadr and change state to follower")
+		rf.ToFollower()
+		rf.CurrentTerm, rf.VoteFor = reply.Term, -1
+		return
+	}
+	if reply.Success {
+		log.Printf("Leader Node{%v} receive the Node{%v} append success next_id{%v} log_len{%v}, add{%v}", rf.me, peer, rf.Next_Idx[peer], len(rf.Log_Array), len(args.Entries))
+		// update next_id and math_id
+		// 防止两个rpc同时到达乱序
+		rf.Next_Idx[peer] += len(args.Entries)
+		rf.Match_Idx[peer] = rf.Next_Idx[peer] - 1
+		//取match_idx的中位数来做commit_idx,因为满足一半peers已经commit了
+		matchIdx := make([]int, 0)
+		for i := 0; i < len(rf.peers); i++ {
+			if rf.me != i {
+				matchIdx = append(matchIdx, rf.Match_Idx[i])
+			}
+		}
+		matchIdx = append(matchIdx, len(rf.Log_Array)-1)
+		commit_idx := matchIdx[(len(matchIdx))/2]
+		DPrintf("match_array{%v} and commit_idx{%v}", rf.Match_Idx, commit_idx)
+		if commit_idx > rf.Committed_Idx {
+			DPrintf("Leader Node{%v} commit increase from{%v} to {%v} and signal", rf.me, rf.Committed_Idx, commit_idx)
+			rf.Committed_Idx = commit_idx
+			//通知applier协程
+			rf.ApplyCond.Signal()
+		}
+	}
+}
+func (rf *Raft) produceAppendRequest(prev_log_idx int) AppendArgs {
+	DPrintf("len log{%v}, prev_log_idx{%v}", len(rf.Log_Array), prev_log_idx)
+	return AppendArgs{
+		Leader_Term:   rf.CurrentTerm,
+		Leader_Id:     rf.me,
+		PrevLogIndex:  prev_log_idx,
+		PrevLogTerm:   rf.Log_Array[prev_log_idx].Log_Term,
+		Entries:       rf.Log_Array[prev_log_idx+1:],
+		Leader_Commit: rf.Committed_Idx,
+	}
+}
+func (rf *Raft) replicator(peer int) {
+	rf.ReplicatorCond[peer].L.Lock()
+	defer rf.ReplicatorCond[peer].L.Unlock()
+	for !rf.killed() {
+		// if there is no need to replicate entries for this peer, just release CPU and wait other goroutine's signal if service adds new Command
+		// if this peer needs replicating entries, this goroutine will call replicateOneRound(peer) multiple times until this peer catches up, and then wait
+		for !rf.NeedReplicating(peer) {
+			rf.ReplicatorCond[peer].Wait()
+		}
+		rf.replicateOneRound(peer)
+	}
+}
+func (rf *Raft) GetLastLog() LogEntry {
+	return rf.Log_Array[len(rf.Log_Array)-1]
+}
+func (rf *Raft) NeedReplicating(peer int) bool {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	return rf.Raft_Status == Leader && rf.Match_Idx[peer] < rf.GetLastLog().Index
+}
+
+func (rf *Raft) BroadcastHeartbeat(isHeartBeat bool) {
+	for peer := range rf.peers {
+		if peer == rf.me {
+			continue
+		}
+		if isHeartBeat {
+			DPrintf("Node{%v} send heartbeat to the Node{%v}", rf.me, peer)
+			go rf.replicateOneRound(peer)
+		} else {
+			DPrintf("Node{%v} start to replicate to the Node{%v}", rf.me, peer)
+			rf.ReplicatorCond[peer].Signal()
+		}
+	}
+}
+
+func (rf *Raft) Start(command interface{}) (int, int, bool) {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	if rf.Raft_Status != Leader {
+		return -1, -1, false
+	}
+	new_entries := rf.AppendNewEntries(command)
+	log.Printf("...............................................................................")
+	DPrintf("{Node %v} receive a new commod[%v] to replicate in term %v", rf.me, new_entries, rf.CurrentTerm)
+	DPrintf("...............................................................................")
+	rf.BroadcastHeartbeat(false)
+	rf.HeartReset()
+	index := new_entries.Index
+	term := rf.CurrentTerm
+	isLeader := true
+	// for i := range rf.peers {
+	// 	if i != rf.me {
+	// 		rf.Next_Idx[i] = len(rf.Log_Array) - 1
+	// 	}
+	// }
 	// Your code here (2B).
 
 	return index, term, isLeader
@@ -287,57 +452,92 @@ func (rf *Raft) ElectionIfOut() bool {
 	log.Println(rf.me, " ...... ", time.Now(), rf.ElectionTimeOut.Add(time.Millisecond*time.Duration(rf.ElectTime)))
 	return time.Now().After(rf.ElectionTimeOut.Add(time.Millisecond * time.Duration(rf.ElectTime)))
 }
-func (rf *Raft) StartHeart() {
-	args := AppendArgs{
-		Leader_Term: rf.CurrentTerm,
-		Leader_Id:   rf.me,
-		// PrevLogTerm:   rf.Log_Array[rf.Next_Idx[idx]].Log_Term,
-		// PrevLogIndex:  rf.Next_Idx[idx],
-		Entries:       rf.Log_Array,
-		Leader_Commit: rf.Committed_Idx,
-	}
-	for i := range rf.peers {
-		if i != rf.me {
-			// pre_idx := rf.Next_Idx[i]
-			go func(idx int) {
-				rf.mu.Lock()
-				if rf.Raft_Status != Leader {
-					rf.mu.Unlock()
-					return
-				}
-				rf.mu.Unlock()
-				reply := AppendReply{}
-				if rf.SendAppendEntries(idx, &args, &reply) {
-					rf.mu.Lock()
-					defer rf.mu.Unlock()
-					if !reply.Success {
-						log.Println("find the leadr and change state to follower")
-						rf.ToFollower()
-						rf.CurrentTerm, rf.VoteFor = reply.Term, -1
-					}
-					// if reply.Success {
-					// 	log.Println("append success", idx)
-					// 	rf.Next_Idx[idx] = len(rf.Log_Array) - 1
-					// 	return
-					// }
-					// // pre_idx == 0的情况
-					// //变化为term中最后一个
-					// if pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
-					// 	for pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
-					// 		pre_idx--
-					// 	}
-					// } else {
-					// 	//已经是term最后一个直接，进入下一个
-					// 	pre_idx--
-					// }
-					// rf.Next_Idx[idx] = pre_idx
-				} else {
-					log.Println("rpc append failed")
-				}
-			}(i)
+
+func (rf *Raft) GetIdxPreTerm(pre_idx int) int {
+	pre_term := rf.Log_Array[pre_idx].Log_Term
+	for i := pre_idx - 1; i >= 0; i-- {
+		if rf.Log_Array[i].Log_Term != pre_term {
+			return i + 1
 		}
 	}
+	return 1
 }
+
+// func (rf *Raft) StartHeart(is_null bool) {
+// 	args := AppendArgs{
+// 		Leader_Term:   rf.CurrentTerm,
+// 		Leader_Id:     rf.me,
+// 		Leader_Commit: rf.Committed_Idx,
+// 	}
+// 	cnt_commit := 0
+// 	flag := true
+// 	if rf.Committed_Idx >= len(rf.Log_Array) {
+// 		is_null = true
+// 		DPrintf("Node{%v}'s commid_idx{%v} >= Log_Array_len{%v}", rf.me, rf.Committed_Idx, rf.Committed_Idx)
+// 	}
+// 	for i := range rf.peers {
+// 		if i != rf.me {
+// 			// pre_idx := rf.Next_Idx[i]
+// 			go func(idx int) {
+// 				rf.mu.Lock()
+// 				if rf.Raft_Status != Leader {
+// 					rf.mu.Unlock()
+// 					return
+// 				}
+// 				args_this := args
+// 				args_this.Is_Null = is_null
+// 				args_this.PrevLogIndex = rf.Next_Idx[idx] - 1
+// 				args_this.PrevLogTerm = rf.Log_Array[args.PrevLogIndex].Log_Term
+// 				args_this.Entries = rf.Log_Array[args.PrevLogIndex:]
+// 				DPrintf("{%v} log will append to the %v isNull{%v}", args_this.Entries, idx, args_this.Is_Null)
+// 				rf.mu.Unlock()
+// 				reply := AppendReply{}
+// 				if rf.SendAppendEntries(idx, &args_this, &reply) {
+// 					rf.mu.Lock()
+// 					defer rf.mu.Unlock()
+// 					if !reply.Success && reply.Term == args.Leader_Term {
+// 						rf.Next_Idx[idx] = rf.GetIdxPreTerm(rf.Next_Idx[idx]-1) + 1
+// 						return
+// 					}
+// 					if !reply.Success && reply.Term > args.Leader_Term {
+// 						log.Println("find the leadr and change state to follower")
+// 						rf.ToFollower()
+// 						rf.CurrentTerm, rf.VoteFor = reply.Term, -1
+// 						return
+// 					}
+// 					if reply.Success {
+// 						cnt_commit++
+// 						if cnt_commit > len(rf.peers)/2 && flag && !is_null {
+// 							rf.Committed_Idx++
+// 							flag = false
+// 							rf.ApplyCond.Signal()
+// 							log.Printf("Node{%v} receive the half commit ,and the new commit{%v}, and signal", rf.me, rf.Committed_Idx)
+// 						}
+// 					}
+// 					DPrintf("the log {%v} cnt_commit{%v}flag{%v} is success replicated, leader {%d} to follower {%d}", args_this.Entries, cnt_commit, flag, rf.me, idx)
+// 					// if reply.Success {
+// 					// 	log.Println("append success", idx)
+// 					// 	rf.Next_Idx[idx] = len(rf.Log_Array) - 1
+// 					// 	return
+// 					// }
+// 					// // pre_idx == 0的情况
+// 					// //变化为term中最后一个
+// 					// if pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
+// 					// 	for pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
+// 					// 		pre_idx--
+// 					// 	}
+// 					// } else {
+// 					// 	//已经是term最后一个直接，进入下一个
+// 					// 	pre_idx--
+// 					// }
+// 					// rf.Next_Idx[idx] = pre_idx
+// 				} else {
+// 					log.Println("rpc append failed")
+// 				}
+// 			}(i)
+// 		}
+// 	}
+// }
 
 func (rf *Raft) ticker() {
 	for !rf.killed() {
@@ -376,7 +576,7 @@ func (rf *Raft) Heart() {
 			if rf.Raft_Status == Leader {
 				log.Println(rf.me, " start heart beat")
 				// 开始心跳监测
-				rf.StartHeart()
+				rf.BroadcastHeartbeat(true)
 				rf.HeartReset()
 			}
 		}
@@ -408,10 +608,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.peers = peers
 	rf.persister = persister
 	rf.me = me
-
+	rf.Log_Array = make([]LogEntry, 1)
 	// Your initialization code here (2A, 2B, 2C).
 	rf.VoteFor = -1
-	rf.CurrentTerm = 1
+	rf.CurrentTerm = 0
 	rf.Raft_Status = Follower
 	rf.Committed_Idx = 0
 	rf.Last_Applied_Idx = 0
@@ -419,8 +619,21 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.HeartBeatTimeOut = time.Now()
 	rf.ElectTime = 500 + rand.Int()%500
 	rf.ElectionTimeOut = time.Now()
+	rf.Next_Idx = make([]int, len(rf.peers))
+	rf.Match_Idx = make([]int, len(rf.peers))
+	rf.ApplyChan = applyCh
+	rf.ReplicatorCond = make([]*sync.Cond, len(rf.peers))
+	rf.ApplyCond = *sync.NewCond(&rf.mu)
+	for peer := range rf.peers {
+		rf.Next_Idx[peer] = 1
+		rf.Match_Idx[peer] = 0
+		if peer != rf.me {
+			rf.ReplicatorCond[peer] = sync.NewCond(&sync.Mutex{})
+			go rf.replicator(peer)
+		}
+	}
+	// ..........to change the idx start from 1
 	// rf.Match_Idx
-	// rf.Next_Idx
 	// TODO:
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
@@ -428,8 +641,37 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// start ticker goroutine to start elections
 	go rf.ticker()
 	go rf.Heart()
-
+	go rf.Applier()
 	return rf
+}
+
+func (rf *Raft) Applier() {
+	for !rf.killed() {
+		rf.mu.Lock()
+		for rf.Last_Applied_Idx >= rf.Committed_Idx || len(rf.Log_Array) <= rf.Committed_Idx {
+			rf.ApplyCond.Wait()
+			DPrintf("Node{%v}, last_applied{%v}, commited_idx{%v}", rf.me, rf.Last_Applied_Idx, rf.Committed_Idx)
+			rf.Committed_Idx = int(math.Min(float64(rf.Committed_Idx), float64(len(rf.Log_Array)-1)))
+			DPrintf("{log len{%d}, commit_id{%d}}", len(rf.Log_Array), rf.Committed_Idx)
+		}
+		DPrintf("Node{%d}commit_idx{%d} last_applied_idx{%d} log{%v}, logtoapply{%v}", rf.me, rf.Committed_Idx, rf.Last_Applied_Idx, rf.Log_Array, rf.Log_Array[rf.Last_Applied_Idx+1:rf.Committed_Idx+1])
+		entries := make([]LogEntry, rf.Committed_Idx-rf.Last_Applied_Idx)
+		copy(entries, rf.Log_Array[rf.Last_Applied_Idx+1:rf.Committed_Idx+1])
+		DPrintf("Node{%v} enries{%v}", rf.me, entries)
+		rf.mu.Unlock()
+		for _, entry := range entries {
+			rf.ApplyChan <- ApplyMsg{
+				CommandValid: true,
+				Command:      entry.Command,
+				CommandIndex: entry.Index,
+			}
+		}
+
+		rf.mu.Lock()
+		DPrintf("{Node %v} applies entries %v-%v in term %v", rf.me, rf.Last_Applied_Idx, rf.Committed_Idx, rf.CurrentTerm)
+		rf.Last_Applied_Idx = int(math.Max(float64(rf.Last_Applied_Idx), float64(rf.Committed_Idx)))
+		rf.mu.Unlock()
+	}
 }
 
 // heartbeat implement
@@ -442,18 +684,12 @@ type AppendArgs struct {
 	Leader_Commit int
 }
 type AppendReply struct {
-	Term    int // update leader itself
-	Success bool
+	Term         int // update leader itself
+	Success      bool
+	PrevLogIndex int // 防止rpc乱序到达
 }
 
 func (rf *Raft) SendAppendEntries(server int, args *AppendArgs, reply *AppendReply) bool {
-	// args.Leader_Term = rf.CurrentTerm
-	// args.Leader_Id = rf.me
-	// TODO:
-	// args.PrevLogIndex
-	// args.PrevLogTerm
-	// args.Leader_Commit = rf.Committed_Idx
-	// args.Entries = rf.Log_Array
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	return ok
 }
@@ -466,13 +702,17 @@ func (rf *Raft) CandidateAction() {
 	rf.VoteFor = rf.me
 	log.Println("candidate start get vote and vote itself")
 	vote_cnt := 1
-	// var wg sync.WaitGroup
-	// wg.Add(len(rf.peers) - 1)
+	var term int
+	if len(rf.Log_Array) == 0 {
+		term = rf.CurrentTerm
+	} else {
+		term = rf.Log_Array[len(rf.Log_Array)-1].Log_Term
+	}
 	args := RequestVoteArgs{
 		Candidate_Curr_Term: rf.CurrentTerm,
 		Candidate_Id:        rf.me,
-		// Last_Log_Index:      last_idx,
-		// Last_Log_Term: rf.Log_Array[last_idx].Log_Term,
+		Last_Log_Index:      len(rf.Log_Array),
+		Last_Log_Term:       term,
 	}
 	for i := range rf.peers {
 		if i != rf.me {
@@ -488,7 +728,7 @@ func (rf *Raft) CandidateAction() {
 				if rf.sendRequestVote(idx, &args, &reply) {
 					rf.mu.Lock()
 					defer rf.mu.Unlock()
-					log.Println(rf.me, "send the rpc to the ", idx)
+					// log.Println(rf.me, "send the rpc to the ", idx)
 					// to do
 					if rf.CurrentTerm == args.Candidate_Curr_Term && rf.Raft_Status == Candidate {
 						log.Println("pos here")
@@ -497,7 +737,8 @@ func (rf *Raft) CandidateAction() {
 							log.Println(rf.me, "get vote numver is", vote_cnt)
 							if vote_cnt > len(rf.peers)/2 {
 								rf.ToLeader()
-								rf.StartHeart()
+								rf.BroadcastHeartbeat(true)
+								rf.HeartReset()
 								log.Println("heart sync finish, change ", rf.me, " to leader")
 							}
 						} else if reply.Current_Term > rf.CurrentTerm {
@@ -526,6 +767,7 @@ func (rf *Raft) ToFollower() {
 }
 func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 	rf.mu.Lock()
+	reply.PrevLogIndex = args.PrevLogIndex
 	log.Println("append ", rf.me)
 	defer rf.mu.Unlock()
 	if args.Leader_Term < rf.CurrentTerm {
@@ -536,29 +778,30 @@ func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 	if args.Leader_Term > rf.CurrentTerm {
 		rf.CurrentTerm, rf.VoteFor = args.Leader_Term, -1
 	}
-	// flag := false
-	// for idx, entry := range rf.Log_Array {
-	// 	if entry.Log_Term == args.PrevLogTerm && idx == args.PrevLogIndex {
-	// 		flag = true
-	// 		break
-	// 	}
-	// }
-	// if !flag {
-	// 	reply.Success = false
-	// 	return
-	// }
-	// // 以上是为了参与者和自己的日志相同，如果不是则拒绝
-	// // 确认一致的最后一条日志，然后删除这条之后的，再添加
-	// if len(rf.Log_Array) > args.PrevLogIndex && rf.Log_Array[args.PrevLogIndex].Log_Term == args.PrevLogTerm {
-	// 	rf.Log_Array = rf.Log_Array[:args.PrevLogIndex+1]
-	// }
-	// // to d
-	// rf.Log_Array = append(rf.Log_Array, args.Entries[args.PrevLogIndex+1:]...)
-	// if args.Leader_Commit > rf.Committed_Idx {
-	// 	rf.Committed_Idx = int(math.Min(float64(args.Leader_Commit), float64(len(rf.Log_Array))))
-	// }
+
+	//日志不match,删除prevlogIndex及其以后的log, 并返回false
+	if args.PrevLogIndex >= len(rf.Log_Array) || rf.Log_Array[args.PrevLogIndex].Log_Term != args.PrevLogTerm {
+		reply.Success = false
+		reply.Term = args.Leader_Term
+		// DPrintf("the follower{%d} log from {%v} to {%v} ", rf.me, rf.Log_Array, rf.Log_Array[:args.PrevLogIndex])
+		if args.PrevLogIndex < len(rf.Log_Array) {
+			rf.Log_Array = rf.Log_Array[:args.PrevLogIndex]
+		}
+		return
+	}
+	// 从PrevLogIndex + 1也就是next_id开始追加存储
+	rf.Log_Array = rf.Log_Array[:args.PrevLogIndex+1]
+	rf.Log_Array = append(rf.Log_Array, args.Entries...)
+	DPrintf("the follower{%d} log is success log{%v}............", rf.me, rf.Log_Array)
+	// 设置本地commit为最新日志和leader_commit中较小的一个
+	if rf.Committed_Idx < args.Leader_Commit {
+		rf.Committed_Idx = int(math.Min(float64(args.Leader_Commit), float64(len(rf.Log_Array)-1)))
+		rf.ApplyCond.Signal()
+		DPrintf("Node{%v} commid{%v} change and notify", rf.me, rf.Committed_Idx)
+	}
+	//心跳内容
 	rf.ToFollower()
-	log.Println("append success", rf.me, "  ", time.Now())
+	// log.Println("append success", rf.me, "  ", time.Now())
 	rf.ResetElection()
 	rf.CurrentTerm = args.Leader_Term
 	reply.Success = true
