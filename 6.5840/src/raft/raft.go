@@ -23,6 +23,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -186,26 +187,26 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
 		return
 	}
-	// election limitation
-	if args.Last_Log_Term < rf.Log_Array[len(rf.Log_Array)-1].Log_Term {
-		reply.Current_Term = rf.CurrentTerm
-		reply.Vote_Granted = false
-		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
-		return
-	}
-	if args.Last_Log_Term == rf.Log_Array[len(rf.Log_Array)-1].Log_Term && args.Last_Log_Index < len(rf.Log_Array)-1 {
-		reply.Current_Term = rf.CurrentTerm
-		reply.Vote_Granted = false
-		log.Println(args.Candidate_Id, " vote grand fail", rf.me)
-		return
-	}
 	if args.Candidate_Curr_Term > rf.CurrentTerm {
 		log.Println("request is higer!!!!")
 		rf.ToFollower()
 		rf.VoteFor = -1
 		rf.CurrentTerm = args.Candidate_Curr_Term
 	}
-	// -1 stand for null
+	// election limitation
+	if args.Last_Log_Term < rf.Log_Array[len(rf.Log_Array)-1].Log_Term {
+		reply.Current_Term = rf.CurrentTerm
+		reply.Vote_Granted = false
+		log.Println(args.Candidate_Id, " vote grand fail the log term not new", rf.me)
+		return
+	}
+	if args.Last_Log_Term == rf.Log_Array[len(rf.Log_Array)-1].Log_Term && args.Last_Log_Index < len(rf.Log_Array)-1 {
+		reply.Current_Term = rf.CurrentTerm
+		reply.Vote_Granted = false
+		log.Println(args.Candidate_Id, " vote grand fail the log length is small", rf.me)
+		return
+	}
+	// 两个条件均满足投true
 
 	rf.VoteFor = args.Candidate_Id
 	reply.Current_Term = rf.CurrentTerm
@@ -271,6 +272,7 @@ func (rf *Raft) AppendNewEntries(command interface{}) LogEntry {
 		rf.Match_Idx[i] = rf.Committed_Idx
 		rf.Next_Idx[i] = len(rf.Log_Array) - 1
 	}
+	rf.Match_Idx[rf.me] = len(rf.Log_Array) - 1
 	return new_entries
 
 }
@@ -325,6 +327,9 @@ func (rf *Raft) processAppendReply(peer int, args AppendArgs, reply AppendReply)
 		rf.CurrentTerm, rf.VoteFor = reply.Term, -1
 		return
 	}
+	if !reply.Success && reply.Term < args.Leader_Term {
+		log.Fatalf("reply term smaller")
+	}
 	if reply.Success {
 		log.Printf("Leader Node{%v} receive the Node{%v} append success next_id{%v} log_len{%v}, add{%v}", rf.me, peer, rf.Next_Idx[peer], len(rf.Log_Array), len(args.Entries))
 		// update next_id and math_id
@@ -332,6 +337,7 @@ func (rf *Raft) processAppendReply(peer int, args AppendArgs, reply AppendReply)
 		rf.Next_Idx[peer] += len(args.Entries)
 		rf.Match_Idx[peer] = rf.Next_Idx[peer] - 1
 		//取match_idx的中位数来做commit_idx,因为满足一半peers已经commit了
+		DPrintf("match_array{%v}}", rf.Match_Idx)
 		matchIdx := make([]int, 0)
 		for i := 0; i < len(rf.peers); i++ {
 			if rf.me != i {
@@ -339,6 +345,7 @@ func (rf *Raft) processAppendReply(peer int, args AppendArgs, reply AppendReply)
 			}
 		}
 		matchIdx = append(matchIdx, len(rf.Log_Array)-1)
+		sort.Ints(matchIdx)
 		commit_idx := matchIdx[(len(matchIdx))/2]
 		DPrintf("match_array{%v} and commit_idx{%v}", rf.Match_Idx, commit_idx)
 		if commit_idx > rf.Committed_Idx {
@@ -462,82 +469,6 @@ func (rf *Raft) GetIdxPreTerm(pre_idx int) int {
 	}
 	return 1
 }
-
-// func (rf *Raft) StartHeart(is_null bool) {
-// 	args := AppendArgs{
-// 		Leader_Term:   rf.CurrentTerm,
-// 		Leader_Id:     rf.me,
-// 		Leader_Commit: rf.Committed_Idx,
-// 	}
-// 	cnt_commit := 0
-// 	flag := true
-// 	if rf.Committed_Idx >= len(rf.Log_Array) {
-// 		is_null = true
-// 		DPrintf("Node{%v}'s commid_idx{%v} >= Log_Array_len{%v}", rf.me, rf.Committed_Idx, rf.Committed_Idx)
-// 	}
-// 	for i := range rf.peers {
-// 		if i != rf.me {
-// 			// pre_idx := rf.Next_Idx[i]
-// 			go func(idx int) {
-// 				rf.mu.Lock()
-// 				if rf.Raft_Status != Leader {
-// 					rf.mu.Unlock()
-// 					return
-// 				}
-// 				args_this := args
-// 				args_this.Is_Null = is_null
-// 				args_this.PrevLogIndex = rf.Next_Idx[idx] - 1
-// 				args_this.PrevLogTerm = rf.Log_Array[args.PrevLogIndex].Log_Term
-// 				args_this.Entries = rf.Log_Array[args.PrevLogIndex:]
-// 				DPrintf("{%v} log will append to the %v isNull{%v}", args_this.Entries, idx, args_this.Is_Null)
-// 				rf.mu.Unlock()
-// 				reply := AppendReply{}
-// 				if rf.SendAppendEntries(idx, &args_this, &reply) {
-// 					rf.mu.Lock()
-// 					defer rf.mu.Unlock()
-// 					if !reply.Success && reply.Term == args.Leader_Term {
-// 						rf.Next_Idx[idx] = rf.GetIdxPreTerm(rf.Next_Idx[idx]-1) + 1
-// 						return
-// 					}
-// 					if !reply.Success && reply.Term > args.Leader_Term {
-// 						log.Println("find the leadr and change state to follower")
-// 						rf.ToFollower()
-// 						rf.CurrentTerm, rf.VoteFor = reply.Term, -1
-// 						return
-// 					}
-// 					if reply.Success {
-// 						cnt_commit++
-// 						if cnt_commit > len(rf.peers)/2 && flag && !is_null {
-// 							rf.Committed_Idx++
-// 							flag = false
-// 							rf.ApplyCond.Signal()
-// 							log.Printf("Node{%v} receive the half commit ,and the new commit{%v}, and signal", rf.me, rf.Committed_Idx)
-// 						}
-// 					}
-// 					DPrintf("the log {%v} cnt_commit{%v}flag{%v} is success replicated, leader {%d} to follower {%d}", args_this.Entries, cnt_commit, flag, rf.me, idx)
-// 					// if reply.Success {
-// 					// 	log.Println("append success", idx)
-// 					// 	rf.Next_Idx[idx] = len(rf.Log_Array) - 1
-// 					// 	return
-// 					// }
-// 					// // pre_idx == 0的情况
-// 					// //变化为term中最后一个
-// 					// if pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
-// 					// 	for pre_idx > 0 && rf.Log_Array[pre_idx-1].Log_Term == rf.Log_Array[pre_idx].Log_Term {
-// 					// 		pre_idx--
-// 					// 	}
-// 					// } else {
-// 					// 	//已经是term最后一个直接，进入下一个
-// 					// 	pre_idx--
-// 					// }
-// 					// rf.Next_Idx[idx] = pre_idx
-// 				} else {
-// 					log.Println("rpc append failed")
-// 				}
-// 			}(i)
-// 		}
-// 	}
-// }
 
 func (rf *Raft) ticker() {
 	for !rf.killed() {
@@ -711,7 +642,7 @@ func (rf *Raft) CandidateAction() {
 	args := RequestVoteArgs{
 		Candidate_Curr_Term: rf.CurrentTerm,
 		Candidate_Id:        rf.me,
-		Last_Log_Index:      len(rf.Log_Array),
+		Last_Log_Index:      len(rf.Log_Array) - 1,
 		Last_Log_Term:       term,
 	}
 	for i := range rf.peers {
@@ -741,7 +672,7 @@ func (rf *Raft) CandidateAction() {
 								rf.HeartReset()
 								log.Println("heart sync finish, change ", rf.me, " to leader")
 							}
-						} else if reply.Current_Term > rf.CurrentTerm {
+						} else if reply.Current_Term >= rf.CurrentTerm {
 							log.Println("the leader to follower ", rf.me)
 							rf.ToFollower()
 							rf.CurrentTerm, rf.VoteFor = reply.Current_Term, -1
@@ -778,16 +709,23 @@ func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 	if args.Leader_Term > rf.CurrentTerm {
 		rf.CurrentTerm, rf.VoteFor = args.Leader_Term, -1
 	}
+	rf.ToFollower()
+	// log.Println("append success", rf.me, "  ", time.Now())
+	rf.ResetElection()
 
 	//日志不match,删除prevlogIndex及其以后的log, 并返回false
-	if args.PrevLogIndex >= len(rf.Log_Array) || rf.Log_Array[args.PrevLogIndex].Log_Term != args.PrevLogTerm {
-		reply.Success = false
-		reply.Term = args.Leader_Term
-		// DPrintf("the follower{%d} log from {%v} to {%v} ", rf.me, rf.Log_Array, rf.Log_Array[:args.PrevLogIndex])
-		if args.PrevLogIndex < len(rf.Log_Array) {
-			rf.Log_Array = rf.Log_Array[:args.PrevLogIndex]
+	if args.PrevLogIndex != 0 {
+		if args.PrevLogIndex >= len(rf.Log_Array) || rf.Log_Array[args.PrevLogIndex].Log_Term != args.PrevLogTerm {
+			reply.Success = false
+			reply.Term = args.Leader_Term
+			// DPrintf("the follower{%d} log from {%v} to {%v} ", rf.me, rf.Log_Array, rf.Log_Array[:args.PrevLogIndex])
+			// if args.PrevLogIndex < len(rf.Log_Array) {
+			// 	rf.Log_Array = rf.Log_Array[:args.PrevLogIndex]
+			// }
+			return
 		}
-		return
+	} else {
+		DPrintf("prevlog_idx = 0")
 	}
 	// 从PrevLogIndex + 1也就是next_id开始追加存储
 	rf.Log_Array = rf.Log_Array[:args.PrevLogIndex+1]
@@ -800,9 +738,6 @@ func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 		DPrintf("Node{%v} commid{%v} change and notify", rf.me, rf.Committed_Idx)
 	}
 	//心跳内容
-	rf.ToFollower()
-	// log.Println("append success", rf.me, "  ", time.Now())
-	rf.ResetElection()
 	rf.CurrentTerm = args.Leader_Term
 	reply.Success = true
 	//TODO:2,3,4,5 in the paper
