@@ -932,16 +932,16 @@ func TestFigure8Unreliable2C(t *testing.T) {
 			}
 		}
 	}
-
 	for i := 0; i < servers; i++ {
 		if cfg.connected[i] == false {
 			cfg.connect(i)
 		}
 	}
-
+	DPrintf("2C figure8 start")
 	cfg.one(rand.Int()%10000, servers, true)
 
 	cfg.end()
+	DPrintf("2C figure8 end")
 }
 
 func internalChurn(t *testing.T, unreliable bool) {
