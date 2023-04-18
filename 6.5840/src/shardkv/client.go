@@ -8,11 +8,14 @@ package shardkv
 // talks to the group that holds the key's shard.
 //
 
-import "6.5840/labrpc"
-import "crypto/rand"
-import "math/big"
-import "6.5840/shardctrler"
-import "time"
+import (
+	"crypto/rand"
+	"math/big"
+	"time"
+
+	"6.5840/labrpc"
+	"6.5840/shardctrler"
+)
 
 // which shard is a key in?
 // please use this function,
@@ -38,6 +41,9 @@ type Clerk struct {
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
 	// You will have to modify this struct.
+	clientId  int64
+	commandId int
+	leaderId  int
 }
 
 // the tester calls MakeClerk.
@@ -51,6 +57,9 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck := new(Clerk)
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
+	ck.clientId = nrand()
+	ck.commandId = 1
+	ck.leaderId = 0
 	// You'll have to add code here.
 	return ck
 }
@@ -71,13 +80,22 @@ func (ck *Clerk) Get(key string) string {
 			for si := 0; si < len(servers); si++ {
 				srv := ck.make_end(servers[si])
 				var reply GetReply
+				args.Key = key
+				args.CommandId_G = ck.commandId
 				ok := srv.Call("ShardKV.Get", &args, &reply)
 				if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
+					DPrintf("Node{%v} get value{%v} sucess", ck.clientId, reply.Value)
+					ck.commandId++
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
 					break
 				}
+				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
+					ck.leaderId = (ck.leaderId + 1) % len(servers)
+					continue
+				}
+
 				// ... not ok, or ErrWrongLeader
 			}
 		}
@@ -97,7 +115,6 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Value = value
 	args.Op = op
 
-
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
@@ -107,10 +124,16 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 				var reply PutAppendReply
 				ok := srv.Call("ShardKV.PutAppend", &args, &reply)
 				if ok && reply.Err == OK {
+					DPrintf("Node{%v} appendput sucess", ck.clientId)
+					ck.commandId++
 					return
 				}
-				if ok && reply.Err == ErrWrongGroup {
+				if ok && (reply.Err == ErrWrongGroup) {
 					break
+				}
+				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
+					ck.leaderId = (ck.leaderId + 1) % len(servers)
+					continue
 				}
 				// ... not ok, or ErrWrongLeader
 			}
