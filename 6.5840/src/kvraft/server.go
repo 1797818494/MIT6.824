@@ -99,13 +99,14 @@ func (kv *KVServer) applylogtoState(op Op) *CommandReply {
 	}
 	if op.OpType == APPEND {
 		return_reply.Err = kv.storage.Append(op.Key, op.Value)
+
 	}
 	if op.OpType == PUT {
 		return_reply.Err = kv.storage.Put(op.Key, op.Value)
 	}
-	DPrintf("..............................")
-	DPrintf("Node{%v} the return reply used {%v}", kv.me, return_reply)
-	DPrintf("..............................")
+	// log.Printf("..............................")
+	// log.Printf("Node{%v} the return reply optype{%v} commidex{%v}, lastapplied{%v} key{%v} value{%v}", kv.me, op.OpType, op.CommandId, kv.lastApplied, op.Key, op.Value)
+	// log.Printf("..............................")
 	return return_reply
 }
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
@@ -131,12 +132,13 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	select {
 	case rpc := <-ch:
 		reply.Value, reply.Err = rpc.Value, rpc.Err
-	case <-time.After(2 * time.Second):
+		// log.Printf("Node{%v} the return reply read commidex{%v}, lastapplied{%v} key{%v}", kv.me, make_op.CommandId, kv.lastApplied, make_op.Key)
+	case <-time.After(500 * time.Millisecond):
 		reply.Err = ErrTimeOut
 	}
-	// kv.mu.Lock()
-	// kv.Delete(index)
-	// kv.mu.Unlock()
+	kv.mu.Lock()
+	kv.Delete(index)
+	kv.mu.Unlock()
 
 }
 
@@ -176,13 +178,16 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	select {
 	case rpc := <-ch:
 		reply.Err = rpc.Err
-	case <-time.After(1 * time.Second):
+		if rpc.Err == OK {
+			// log.Printf("reply will Node{%v} the return reply optype{%v} commidex{%v}, lastapplied{%v} key{%v} value{%v}", kv.me, make_op.OpType, make_op.CommandId, kv.lastApplied, make_op.Key, make_op.Value)
+		}
+	case <-time.After(500 * time.Millisecond):
 		reply.Err = ErrTimeOut
 	}
 	DPrintf("Node{%v} here will reply{%v}", kv.me, reply)
-	// kv.mu.Lock()
-	// kv.Delete(index)
-	// kv.mu.Unlock()
+	kv.mu.Lock()
+	kv.Delete(index)
+	kv.mu.Unlock()
 
 }
 
@@ -221,6 +226,9 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
+	labgob.Register(ClientInfo{})
+	labgob.Register(KVstorage{})
+	labgob.Register(CommandReply{})
 
 	kv := new(KVServer)
 	kv.me = me
@@ -266,7 +274,6 @@ func (kv *KVServer) applier() {
 						if make_op.OpType != GET {
 							kv.clientsInformation[make_op.ClientId] = ClientInfo{Last_commandId: make_op.CommandId, Last_repy: *reply}
 						}
-						kv.rf.Persist(kv.clientsInformation, kv.storage)
 					}
 					// kv.rf.Persist(kv.clientsInformation, kv.lastApplied)
 					current_term, is_Leader := kv.rf.GetState()
@@ -274,6 +281,9 @@ func (kv *KVServer) applier() {
 						DPrintf("Node{%v} get state", kv.me)
 						notify_chan := kv.newChannel(message.CommandIndex)
 						notify_chan <- reply
+						// if kv.maxraftstate != -1 {
+						// 	kv.rf.Persist(kv.clientsInformation, kv.storage)
+						// }
 						DPrintf("reply to notify chan{%v}", reply)
 					} else {
 						DPrintf("Node{%v} is not leader", kv.me)
@@ -286,10 +296,9 @@ func (kv *KVServer) applier() {
 					kv.mu.Unlock()
 				} else if message.SnapshotValid {
 					kv.mu.Lock()
-					if kv.rf.CondInstallSnapshot(message.SnapshotIndex, message.SnapshotTerm, message.Snapshot) {
-						kv.storeSnapshot(message.Snapshot)
-						kv.lastApplied = message.SnapshotIndex
-					}
+					kv.storeSnapshot(message.Snapshot)
+					kv.lastApplied = message.SnapshotIndex
+
 					kv.mu.Unlock()
 				} else {
 					panic(fmt.Sprintf("Valid message{%v}", message))
@@ -307,13 +316,14 @@ func (kv *KVServer) applier() {
 func (kv *KVServer) snapMake(snapIndex int) {
 	w := new(bytes.Buffer)
 	e := labgob.NewEncoder(w)
+	// log.Printf("node{%v} snapMake key0 {%v}", kv.me, kv.storage.KV["0"])
 	e.Encode(kv.clientsInformation)
 	e.Encode(kv.storage)
 	kv.rf.Snapshot(snapIndex, w.Bytes())
 }
 
 func (kv *KVServer) storeSnapshot(snapshot []byte) {
-	if len(snapshot) < 1 || snapshot == nil {
+	if len(snapshot) < 1 || snapshot == nil || kv.maxraftstate == -1 {
 		return
 	}
 	r := bytes.NewBuffer(snapshot)
@@ -323,7 +333,7 @@ func (kv *KVServer) storeSnapshot(snapshot []byte) {
 		log.Fatalf("Node{%v} failed storeSnapshot", kv.me)
 	}
 	kv.clientsInformation = client_information
-	DPrintf("success store")
+	// log.Printf("node{%v} snapdecode key0 {%v}", kv.me, kv.storage.KV["0"])
 }
 func (kv *KVServer) newChannel(commandIdx int) chan *CommandReply {
 	_, ok := kv.notify_chann[commandIdx]

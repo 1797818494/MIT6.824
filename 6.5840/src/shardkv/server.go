@@ -10,12 +10,6 @@ import (
 	"6.5840/raft"
 )
 
-const (
-	GET    = 0
-	PUT    = 1
-	APPEND = 2
-)
-
 type KVstorage struct {
 	KV map[string]string
 }
@@ -115,11 +109,10 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	case <-time.After(1 * time.Second):
 		reply.Err = ErrTimeOut
 	}
-	go func() {
-		kv.mu.Lock()
-		kv.Delete(index)
-		kv.mu.Unlock()
-	}()
+	kv.mu.Lock()
+	kv.Delete(index)
+	kv.mu.Unlock()
+	kv.rf
 	// Your code here.
 }
 
@@ -266,6 +259,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	kv.ctrlers = ctrlers
 	kv.storage = NewKVstorage()
 	kv.lastApplied = 0
+	// 3A
 	// Your initialization code here.
 
 	// Use something like this to talk to the shardctrler:

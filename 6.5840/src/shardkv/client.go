@@ -10,6 +10,7 @@ package shardkv
 
 import (
 	"crypto/rand"
+	"log"
 	"math/big"
 	"time"
 
@@ -71,11 +72,13 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 func (ck *Clerk) Get(key string) string {
 	args := GetArgs{}
 	args.Key = key
+	DPrintf("Node{%v} start get key{%v}", ck.clientId, key)
 
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
+			ck.leaderId = 0
 			// try each server for the shard.
 			for si := 0; si < len(servers); si++ {
 				srv := ck.make_end(servers[si])
@@ -89,13 +92,15 @@ func (ck *Clerk) Get(key string) string {
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
+					DPrintf("Node{%v} get Errgroup", ck.clientId)
 					break
 				}
 				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
 					ck.leaderId = (ck.leaderId + 1) % len(servers)
+					DPrintf("Node{%v} get change leaderId{%v}", ck.clientId, ck.leaderId)
 					continue
 				}
-
+				log.Fatalf("ok{%v}, reply{%v}", ok, reply)
 				// ... not ok, or ErrWrongLeader
 			}
 		}
@@ -114,11 +119,13 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Key = key
 	args.Value = value
 	args.Op = op
-
+	DPrintf("Node{%v} start appendput{%v}", ck.clientId, key)
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
+		DPrintf("node servers{%v} gid{%v}", ck.config.Groups, gid)
 		if servers, ok := ck.config.Groups[gid]; ok {
+			DPrintf("here1")
 			for si := 0; si < len(servers); si++ {
 				srv := ck.make_end(servers[si])
 				var reply PutAppendReply
@@ -129,15 +136,19 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 					return
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
+					DPrintf("Node{%v} appendget Errgroup", ck.clientId)
 					break
 				}
 				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
 					ck.leaderId = (ck.leaderId + 1) % len(servers)
+					DPrintf("Node{%v} appendput change leaderId{%v}", ck.clientId, ck.leaderId)
 					continue
 				}
+				log.Fatalf("ok{%v}, reply{%v}", ok, reply)
 				// ... not ok, or ErrWrongLeader
 			}
 		}
+		DPrintf("here")
 		time.Sleep(100 * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)

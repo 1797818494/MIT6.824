@@ -1,0 +1,184 @@
+Test: static shards ...
+2023/04/18 09:59:43 Node{3358324958764894429} start appendput{0}
+2023/04/18 09:59:43 node servers{map[]} gid{0}
+2023/04/18 09:59:43 here
+2023/04/18 09:59:43 node servers{map[]} gid{0}
+2023/04/18 09:59:43 here
+2023/04/18 09:59:43 node servers{map[]} gid{0}
+2023/04/18 09:59:43 here
+2023/04/18 09:59:43 node servers{map[]} gid{0}
+2023/04/18 09:59:43 here
+2023/04/18 09:59:43 node servers{map[]} gid{0}
+2023/04/18 09:59:43 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:44 node servers{map[]} gid{0}
+2023/04/18 09:59:44 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:45 node servers{map[]} gid{0}
+2023/04/18 09:59:45 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:46 node servers{map[]} gid{0}
+2023/04/18 09:59:46 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:47 node servers{map[]} gid{0}
+2023/04/18 09:59:47 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:48 node servers{map[]} gid{0}
+2023/04/18 09:59:48 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:49 node servers{map[]} gid{0}
+2023/04/18 09:59:49 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:50 node servers{map[]} gid{0}
+2023/04/18 09:59:50 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:51 node servers{map[]} gid{0}
+2023/04/18 09:59:51 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+2023/04/18 09:59:52 node servers{map[]} gid{0}
+2023/04/18 09:59:52 here
+signal: interrupt
+FAIL	6.5840/shardkv	9.318s
