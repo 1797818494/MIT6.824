@@ -96,6 +96,10 @@ type Raft struct {
 	seq              uint64
 	lastIncludeIdx   int
 	lastIncludeTerm  int
+	//add
+	snap_lock    sync.Mutex
+	snapshot_idx int
+
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
 }
@@ -272,7 +276,10 @@ func (rf *Raft) InstallSnapshot(args *SnapArgs, reply *SnapReply) {
 		SnapshotIndex: args.LastIncludedIndex,
 	}
 	rf.mu.Unlock()
+	rf.snap_lock.Lock()
+	rf.snapshot_idx = applyMsg.SnapshotIndex
 	rf.ApplyChan <- applyMsg
+	rf.snap_lock.Unlock()
 }
 
 // the service says it has created a snapshot that has
@@ -847,6 +854,11 @@ func (rf *Raft) Applier() {
 		commit_idx := rf.Committed_Idx
 		rf.mu.Unlock()
 		DPrintf("Node{%v}pos here1", rf.me)
+		rf.snap_lock.Lock()
+		if rf.snapshot_idx >= commit_idx {
+			rf.snap_lock.Unlock()
+			continue
+		}
 		for _, entry := range entries {
 			rf.ApplyChan <- ApplyMsg{
 				CommandValid: true,
@@ -855,6 +867,7 @@ func (rf *Raft) Applier() {
 				CommandTerm:  entry.Log_Term,
 			}
 		}
+		rf.snap_lock.Unlock()
 		DPrintf("Node{%v} pos here2", rf.me)
 		rf.mu.Lock()
 		DPrintf("{Node %v} applies entries %v-%v in term %v", rf.me, rf.Last_Applied_Idx, rf.Committed_Idx, rf.CurrentTerm)
