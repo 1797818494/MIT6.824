@@ -992,7 +992,7 @@ func (rf *Raft) checkMyLog(prev_log_idx int, args []LogEntry) bool {
 	flag := true
 	if len(Log) > len(args) {
 		for i := 0; i < len(args); i++ {
-			if Log[i] != args[i] {
+			if Log[i].Index != args[i].Index || Log[i].Log_Term != args[i].Log_Term {
 				flag = false
 				break
 			}

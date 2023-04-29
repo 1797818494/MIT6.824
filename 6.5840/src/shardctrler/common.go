@@ -29,7 +29,11 @@ type Config struct {
 }
 
 const (
-	OK = "OK"
+	OK             = "OK"
+	ErrNoKey       = "ErrNoKey"
+	ErrWrongLeader = "ErrWrongLeader"
+	ErrTimeOut     = "ErrTimeOut"
+	ErrWrongGroup  = "ErrWrongGroup"
 )
 
 type Err string
