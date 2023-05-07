@@ -10,7 +10,6 @@ package shardkv
 
 import (
 	"crypto/rand"
-	"log"
 	"math/big"
 	"time"
 
@@ -42,9 +41,6 @@ type Clerk struct {
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
 	// You will have to modify this struct.
-	clientId  int64
-	commandId int
-	leaderId  int
 }
 
 // the tester calls MakeClerk.
@@ -58,9 +54,6 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck := new(Clerk)
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
-	ck.clientId = nrand()
-	ck.commandId = 1
-	ck.leaderId = 0
 	// You'll have to add code here.
 	return ck
 }
@@ -72,35 +65,22 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 func (ck *Clerk) Get(key string) string {
 	args := GetArgs{}
 	args.Key = key
-	DPrintf("Node{%v} start get key{%v}", ck.clientId, key)
 
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
-			ck.leaderId = 0
 			// try each server for the shard.
 			for si := 0; si < len(servers); si++ {
 				srv := ck.make_end(servers[si])
 				var reply GetReply
-				args.Key = key
-				args.CommandId_G = ck.commandId
 				ok := srv.Call("ShardKV.Get", &args, &reply)
 				if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
-					DPrintf("Node{%v} get value{%v} sucess", ck.clientId, reply.Value)
-					ck.commandId++
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
-					DPrintf("Node{%v} get Errgroup", ck.clientId)
 					break
 				}
-				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
-					ck.leaderId = (ck.leaderId + 1) % len(servers)
-					DPrintf("Node{%v} get change leaderId{%v}", ck.clientId, ck.leaderId)
-					continue
-				}
-				log.Fatalf("ok{%v}, reply{%v}", ok, reply)
 				// ... not ok, or ErrWrongLeader
 			}
 		}
@@ -119,36 +99,24 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Key = key
 	args.Value = value
 	args.Op = op
-	DPrintf("Node{%v} start appendput{%v}", ck.clientId, key)
+
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
-		DPrintf("node servers{%v} gid{%v}", ck.config.Groups, gid)
 		if servers, ok := ck.config.Groups[gid]; ok {
-			DPrintf("here1")
 			for si := 0; si < len(servers); si++ {
 				srv := ck.make_end(servers[si])
 				var reply PutAppendReply
 				ok := srv.Call("ShardKV.PutAppend", &args, &reply)
 				if ok && reply.Err == OK {
-					DPrintf("Node{%v} appendput sucess", ck.clientId)
-					ck.commandId++
 					return
 				}
-				if ok && (reply.Err == ErrWrongGroup) {
-					DPrintf("Node{%v} appendget Errgroup", ck.clientId)
+				if ok && reply.Err == ErrWrongGroup {
 					break
 				}
-				if !ok || reply.Err == ErrWrongLeader || reply.Err == ErrTimeOut {
-					ck.leaderId = (ck.leaderId + 1) % len(servers)
-					DPrintf("Node{%v} appendput change leaderId{%v}", ck.clientId, ck.leaderId)
-					continue
-				}
-				log.Fatalf("ok{%v}, reply{%v}", ok, reply)
 				// ... not ok, or ErrWrongLeader
 			}
 		}
-		DPrintf("here")
 		time.Sleep(100 * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
