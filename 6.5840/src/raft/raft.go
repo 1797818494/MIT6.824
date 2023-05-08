@@ -1079,3 +1079,9 @@ func (rf *Raft) AppendEntries(args *AppendArgs, reply *AppendReply) {
 	//TODO:2,3,4,5 in the paper
 
 }
+
+func (rf *Raft) HasLogCurrentTerm() bool {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	return rf.Log_Array[len(rf.Log_Array)-1].Log_Term == rf.CurrentTerm
+}
