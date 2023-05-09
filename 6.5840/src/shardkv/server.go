@@ -147,6 +147,10 @@ func (kv *ShardKV) isDuplicated(clientId int64, commandId int) bool {
 }
 
 func (kv *ShardKV) canServer(shardID int) bool {
+	if kv.stateMachines[shardID] == nil {
+		kv.stateMachines[shardID] = &Shard{make(map[string]string), Serving}
+	}
+	DPrintf("shardId{%v} {%v} {%v} {%v} {%v} config{%v}", shardID, kv.currentConfig.Shards[shardID], kv.gid, kv.stateMachines[shardID].Status, kv.currentConfig.Num, kv.currentConfig)
 	return kv.currentConfig.Shards[shardID] == kv.gid && (kv.stateMachines[shardID].Status == Serving || kv.stateMachines[shardID].Status == Gcing)
 }
 
@@ -196,6 +200,43 @@ func NewEmptyEntryCommand() Command {
 	return Command{EmptyEntry, nil}
 }
 func (kv *ShardKV) Execute(command Command, responce *CommandResponce) {
+	var index int
+	var is_leader bool
+	if command.Op == Operation {
+		index, _, is_leader = kv.rf.Start(command)
+	}
+	if command.Op == Configuration {
+		index, _, is_leader = kv.rf.Start(command)
+	}
+	if command.Op == InsertShards {
+		index, _, is_leader = kv.rf.Start(command)
+	}
+	if command.Op == DeleteShards {
+		index, _, is_leader = kv.rf.Start(command)
+	}
+	if command.Op == EmptyEntry {
+		index, _, is_leader = kv.rf.Start(command)
+	}
+	if !is_leader {
+		DPrintf("node{%v} isn't leader", kv.me)
+		responce.Err = ErrWrongLeader
+		return
+	}
+	kv.mu.Lock()
+	ch := kv.newChannel(index)
+	kv.mu.Unlock()
+	select {
+	case responce_msg := <-ch:
+		{
+			responce.Value, responce.Err = responce_msg.Value, responce_msg.Err
+			DPrintf("responce err {%v} value{%v}", responce.Err, responce.Value)
+		}
+	case <-time.After(500 * time.Millisecond):
+		responce.Err = ErrTimeOut
+	}
+	kv.mu.Lock()
+	kv.Delete(index)
+	kv.mu.Unlock()
 
 }
 func (kv *ShardKV) applyOperation(message *raft.ApplyMsg, operation *CommandRequest) *CommandResponce {
@@ -212,7 +253,7 @@ func (kv *ShardKV) applyOperation(message *raft.ApplyMsg, operation *CommandRequ
 			return responce
 		}
 	}
-	return &CommandResponce{ErrWrongGroup, ""}
+	return &CommandResponce{"", ErrWrongGroup}
 }
 
 func (kv *ShardKV) applyLogToStateMachine(operation *CommandRequest, shardID int) *CommandResponce {
@@ -221,6 +262,14 @@ func (kv *ShardKV) applyLogToStateMachine(operation *CommandRequest, shardID int
 	}
 	if operation.Op == OpAppend {
 		kv.stateMachines[key2shard(operation.Key)].KV[operation.Key] += operation.Value
+	}
+	if operation.Op == OpGet {
+		value, ok := kv.stateMachines[key2shard(operation.Key)].KV[operation.Key]
+		if ok {
+			return &CommandResponce{value, OK}
+		} else {
+			return &CommandResponce{"", ErrNoKey}
+		}
 	}
 	return &CommandResponce{"", OK}
 
@@ -246,6 +295,7 @@ func (kv *ShardKV) applier() {
 					operation := command.Data.(CommandRequest)
 					responce = kv.applyOperation(&message, &operation)
 				case Configuration:
+					DPrintf("into configuration apply")
 					nextConfig := command.Data.(shardctrler.Config)
 					responce = kv.applyConfiguration(&nextConfig)
 				case InsertShards:
@@ -257,7 +307,7 @@ func (kv *ShardKV) applier() {
 				case EmptyEntry:
 					responce = kv.applyEmptyEntry()
 				}
-
+				DPrintf("Node{%v} get here", kv.me)
 				if current_term, isLeader := kv.rf.GetState(); isLeader && message.CommandTerm == current_term {
 					ch := kv.newChannel(message.CommandIndex)
 					ch <- responce
@@ -287,7 +337,12 @@ func (kv *ShardKV) applier() {
 func (kv *ShardKV) getShardIDsByStatus(shard_status ShardStatus) map[int][]int {
 	g2s := make(map[int][]int)
 	for g, shardsID := range kv.lastconfig.Shards {
-		g2s[g] = append(g2s[g], shardsID)
+		if kv.stateMachines[shardsID] == nil {
+			kv.stateMachines[shardsID] = &Shard{make(map[string]string), Serving}
+		}
+		if kv.stateMachines[shardsID].Status == shard_status {
+			g2s[g] = append(g2s[g], shardsID)
+		}
 	}
 	return g2s
 }
@@ -455,7 +510,9 @@ func (kv *ShardKV) storeSnapshot(snapshot []byte) {
 
 func (kv *ShardKV) configureAction() {
 	canPerformNextConfig := true
+	DPrintf("gid{%v} here try lock", kv.gid)
 	kv.mu.Lock()
+	DPrintf("gid{%v} here try unlock", kv.gid)
 	for _, shard := range kv.stateMachines {
 		if shard.Status != Serving {
 			canPerformNextConfig = false
@@ -470,22 +527,32 @@ func (kv *ShardKV) configureAction() {
 			DPrintf("node{%v} fetch the new configuration", kv.me)
 			kv.Execute(NewConfigurationCommand(&nextConfig), &CommandResponce{})
 		}
-
+		DPrintf("kv.gid{%v} nextconfig{%v}  currentconfig{%v} error1 config{%v}", kv.gid, nextConfig.Num, currentConfigNum, kv.currentConfig)
+	} else {
+		log.Fatal("can't next config")
 	}
+	DPrintf("gid{%v} reach here", kv.gid)
 }
 
 func (kv *ShardKV) updateShardStatus(config *shardctrler.Config) {
-
+	for shardID := range config.Shards {
+		if kv.stateMachines[shardID] == nil {
+			kv.stateMachines[shardID] = &Shard{make(map[string]string), Serving}
+		}
+		// kv.stateMachines[shardID].Status = Pulling
+	}
 }
 
 func (kv *ShardKV) applyConfiguration(nextConfig *shardctrler.Config) *CommandResponce {
 	if nextConfig.Num == kv.currentConfig.Num+1 {
+		DPrintf("config apply success Num{%v} shards{%v}", nextConfig.Num, nextConfig.Shards)
 		kv.updateShardStatus(nextConfig)
 		kv.lastconfig = kv.currentConfig
 		kv.currentConfig = *nextConfig
-		return &CommandResponce{OK, ""}
+		return &CommandResponce{"", OK}
 	}
-	return &CommandResponce{ErrOutDated, ""}
+	DPrintf("config apply fail Num{%v} {%v}", nextConfig.Num, kv.currentConfig.Num+1)
+	return &CommandResponce{"", ErrOutDated}
 }
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
@@ -548,6 +615,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	kv.gid = gid
 	kv.ctrlers = ctrlers
 	kv.lastapplied = 0
+	kv.sc = shardctrler.MakeClerk(ctrlers)
 	kv.applyCh = make(chan raft.ApplyMsg)
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 	kv.currentConfig = shardctrler.Config{Groups: make(map[int][]string)}
@@ -565,15 +633,15 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// start configuration monitor goroutine to fetch latest configuration
 	go kv.Monitor(kv.configureAction, ConfigureMonitorTimeout)
 	// start migration monitor goroutine to pull related shards
-	go kv.Monitor(kv.migrationAction, MigrationMonitorTimeout)
+	// go kv.Monitor(kv.migrationAction, MigrationMonitorTimeout)
 	// start gc monitor goroutine to delete useless shards in remote groups
-	go kv.Monitor(kv.gcAction, GCMonitorTimeout)
+	// go kv.Monitor(kv.gcAction, GCMonitorTimeout)
 	// start entry-in-currentTerm monitor goroutine to advance commitIndex by appending empty entries in current term periodically to avoid live locks
-	go kv.Monitor(kv.checkEntryInCurrentTermAction, EmptyEntryDetectorTimeout)
+	// go kv.Monitor(kv.checkEntryInCurrentTermAction, EmptyEntryDetectorTimeout)
 	return kv
 }
 
-const ConfigureMonitorTimeout = 50 * time.Millisecond
+const ConfigureMonitorTimeout = 300 * time.Millisecond
 const MigrationMonitorTimeout = 50 * time.Millisecond
 const GCMonitorTimeout = 50 * time.Millisecond
 const EmptyEntryDetectorTimeout = 50 * time.Millisecond

@@ -1,184 +1,591 @@
-Test: static shards ...
-2023/04/18 09:59:43 Node{3358324958764894429} start appendput{0}
-2023/04/18 09:59:43 node servers{map[]} gid{0}
-2023/04/18 09:59:43 here
-2023/04/18 09:59:43 node servers{map[]} gid{0}
-2023/04/18 09:59:43 here
-2023/04/18 09:59:43 node servers{map[]} gid{0}
-2023/04/18 09:59:43 here
-2023/04/18 09:59:43 node servers{map[]} gid{0}
-2023/04/18 09:59:43 here
-2023/04/18 09:59:43 node servers{map[]} gid{0}
-2023/04/18 09:59:43 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:44 node servers{map[]} gid{0}
-2023/04/18 09:59:44 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:45 node servers{map[]} gid{0}
-2023/04/18 09:59:45 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:46 node servers{map[]} gid{0}
-2023/04/18 09:59:46 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:47 node servers{map[]} gid{0}
-2023/04/18 09:59:47 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:48 node servers{map[]} gid{0}
-2023/04/18 09:59:48 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:49 node servers{map[]} gid{0}
-2023/04/18 09:59:49 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:50 node servers{map[]} gid{0}
-2023/04/18 09:59:50 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:51 node servers{map[]} gid{0}
-2023/04/18 09:59:51 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
-2023/04/18 09:59:52 node servers{map[]} gid{0}
-2023/04/18 09:59:52 here
+Test: join then leave ...
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{3271227794175876081 1 1 map[] [] 0 0 -1} 1 1}] to replicate in term 1
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{4163964282632690063 2 1 map[100:[server-100-0 server-100-1 server-100-2]] [] 0 0 0} 1 2}] to replicate in term 1
+2023/05/09 18:09:39 put k{0} v{FW3Mb}
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{2689577660557185039 1 1 map[] [] 0 0 1} 1 3}] to replicate in term 1
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{1996281950357502684 1 1 map[] [] 0 0 1} 1 4}] to replicate in term 1
+2023/05/09 18:09:39 node{1} fetch the new configuration
+2023/05/09 18:09:39 {Node 1} receive a new commodidx[{{1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1}] to replicate in term 1
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{3271227794175876081 1 2 map[] [] 0 0 -1} 1 5}] to replicate in term 1
+2023/05/09 18:09:39 node{0} fetch the new configuration
+2023/05/09 18:09:39 {Node 0} receive a new commodidx[{{1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1}] to replicate in term 1
+2023/05/09 18:09:39 Node{1} Group{101} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:39 into configuration apply
+2023/05/09 18:09:39 Node{0} Group{102} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:39 into configuration apply
+2023/05/09 18:09:39 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:39 Node{0} get here
+2023/05/09 18:09:39 responce{&{OK }} notify chan
+2023/05/09 18:09:39 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:39 Node{1} get here
+2023/05/09 18:09:39 responce{&{OK }} notify chan
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 Node{0} Group{101} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:40 into configuration apply
+2023/05/09 18:09:40 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:40 Node{0} get here
+2023/05/09 18:09:40 Node{0} is no leader
+2023/05/09 18:09:40 Node{2} Group{101} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:40 into configuration apply
+2023/05/09 18:09:40 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:40 Node{2} get here
+2023/05/09 18:09:40 Node{2} is no leader
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 Node{2} Group{102} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:40 into configuration apply
+2023/05/09 18:09:40 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:40 Node{2} get here
+2023/05/09 18:09:40 Node{2} is no leader
+2023/05/09 18:09:40 Node{1} Group{102} try to apply message{{true {1 {1 [100 100 100 100 100 100 100 100 100 100] map[100:[server-100-0 server-100-1 server-100-2]]}} 1 1 false [] 0 0}}
+2023/05/09 18:09:40 into configuration apply
+2023/05/09 18:09:40 config apply success Num{1} shards{[100 100 100 100 100 100 100 100 100 100]}
+2023/05/09 18:09:40 Node{1} get here
+2023/05/09 18:09:40 Node{1} is no leader
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 3 map[] [] 0 0 -1} 1 6}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{2689577660557185039 1 2 map[] [] 0 0 2} 1 7}] to replicate in term 1
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 4 map[] [] 0 0 -1} 1 8}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 5 map[] [] 0 0 -1} 1 9}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 6 map[] [] 0 0 -1} 1 10}] to replicate in term 1
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{2689577660557185039 1 3 map[] [] 0 0 2} 1 11}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 7 map[] [] 0 0 -1} 1 12}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{886458744413715192 1 1 map[] [] 0 0 2} 1 13}] to replicate in term 1
+2023/05/09 18:09:40 {Node 0} receive a new commodidx[{{3271227794175876081 1 8 map[] [] 0 0 -1} 1 14}] to replicate in term 1
+2023/05/09 18:09:40 {0} {100} {0}
+2023/05/09 18:09:40 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 9 map[] [] 0 0 -1} 1 15}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{1215659339493418900 1 1 map[] [] 0 0 2} 1 16}] to replicate in term 1
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 10 map[] [] 0 0 -1} 1 17}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{886458744413715192 1 2 map[] [] 0 0 2} 1 18}] to replicate in term 1
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 11 map[] [] 0 0 -1} 1 19}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 12 map[] [] 0 0 -1} 1 20}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{1215659339493418900 1 2 map[] [] 0 0 2} 1 21}] to replicate in term 1
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{886458744413715192 1 3 map[] [] 0 0 2} 1 22}] to replicate in term 1
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 13 map[] [] 0 0 -1} 1 23}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 14 map[] [] 0 0 -1} 1 24}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:41 {Node 0} receive a new commodidx[{{3271227794175876081 1 15 map[] [] 0 0 -1} 1 25}] to replicate in term 1
+2023/05/09 18:09:41 {0} {100} {0}
+2023/05/09 18:09:41 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 16 map[] [] 0 0 -1} 1 26}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{1215659339493418900 1 3 map[] [] 0 0 2} 1 27}] to replicate in term 1
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{886458744413715192 1 4 map[] [] 0 0 2} 1 28}] to replicate in term 1
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 17 map[] [] 0 0 -1} 1 29}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 18 map[] [] 0 0 -1} 1 30}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 19 map[] [] 0 0 -1} 1 31}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{1215659339493418900 1 4 map[] [] 0 0 2} 1 32}] to replicate in term 1
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 20 map[] [] 0 0 -1} 1 33}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{1996281950357502684 1 2 map[] [] 0 0 2} 1 34}] to replicate in term 1
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{3271227794175876081 1 21 map[] [] 0 0 -1} 1 35}] to replicate in term 1
+2023/05/09 18:09:42 {Node 0} receive a new commodidx[{{1215659339493418900 1 5 map[] [] 0 0 2} 1 36}] to replicate in term 1
+2023/05/09 18:09:42 {0} {100} {0}
+2023/05/09 18:09:42 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 22 map[] [] 0 0 -1} 1 37}] to replicate in term 1
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{1996281950357502684 1 3 map[] [] 0 0 2} 1 38}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 23 map[] [] 0 0 -1} 1 39}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{886458744413715192 1 5 map[] [] 0 0 2} 1 40}] to replicate in term 1
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 24 map[] [] 0 0 -1} 1 41}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{1215659339493418900 1 6 map[] [] 0 0 2} 1 42}] to replicate in term 1
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 25 map[] [] 0 0 -1} 1 43}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 26 map[] [] 0 0 -1} 1 44}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{886458744413715192 1 6 map[] [] 0 0 2} 1 45}] to replicate in term 1
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 27 map[] [] 0 0 -1} 1 46}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{1215659339493418900 1 7 map[] [] 0 0 2} 1 47}] to replicate in term 1
+2023/05/09 18:09:43 {Node 0} receive a new commodidx[{{3271227794175876081 1 28 map[] [] 0 0 -1} 1 48}] to replicate in term 1
+2023/05/09 18:09:43 {0} {100} {0}
+2023/05/09 18:09:43 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{3271227794175876081 1 29 map[] [] 0 0 -1} 1 49}] to replicate in term 1
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{886458744413715192 1 7 map[] [] 0 0 2} 1 50}] to replicate in term 1
+2023/05/09 18:09:44 {0} {100} {0}
+2023/05/09 18:09:44 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{1215659339493418900 1 8 map[] [] 0 0 2} 1 51}] to replicate in term 1
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{3271227794175876081 1 30 map[] [] 0 0 -1} 1 52}] to replicate in term 1
+2023/05/09 18:09:44 {0} {100} {0}
+2023/05/09 18:09:44 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{3271227794175876081 1 31 map[] [] 0 0 -1} 1 53}] to replicate in term 1
+2023/05/09 18:09:44 {0} {100} {0}
+2023/05/09 18:09:44 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{886458744413715192 1 8 map[] [] 0 0 2} 1 54}] to replicate in term 1
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{3271227794175876081 1 32 map[] [] 0 0 -1} 1 55}] to replicate in term 1
+2023/05/09 18:09:44 {0} {100} {0}
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{1215659339493418900 1 9 map[] [] 0 0 2} 1 56}] to replicate in term 1
+2023/05/09 18:09:44 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{3271227794175876081 1 33 map[] [] 0 0 -1} 1 57}] to replicate in term 1
+2023/05/09 18:09:44 {0} {100} {0}
+2023/05/09 18:09:44 wronggroup
+2023/05/09 18:09:44 {Node 0} receive a new commodidx[{{886458744413715192 1 9 map[] [] 0 0 2} 1 58}] to replicate in term 1
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{3271227794175876081 1 34 map[] [] 0 0 -1} 1 59}] to replicate in term 1
+2023/05/09 18:09:45 {0} {100} {0}
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{1215659339493418900 1 10 map[] [] 0 0 2} 1 60}] to replicate in term 1
+2023/05/09 18:09:45 wronggroup
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{886458744413715192 1 10 map[] [] 0 0 2} 1 61}] to replicate in term 1
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{3271227794175876081 1 35 map[] [] 0 0 -1} 1 62}] to replicate in term 1
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{1996281950357502684 1 4 map[] [] 0 0 2} 1 63}] to replicate in term 1
+2023/05/09 18:09:45 {0} {100} {0}
+2023/05/09 18:09:45 wronggroup
+2023/05/09 18:09:45 {Node 0} receive a new commodidx[{{3271227794175876081 1 36 map[] [] 0 0 -1} 1 64}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 37 map[] [] 0 0 -1} 1 65}] to replicate in term 1
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{1996281950357502684 1 5 map[] [] 0 0 2} 1 66}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 38 map[] [] 0 0 -1} 1 67}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{1215659339493418900 1 11 map[] [] 0 0 2} 1 68}] to replicate in term 1
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 39 map[] [] 0 0 -1} 1 69}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{1996281950357502684 1 6 map[] [] 0 0 2} 1 70}] to replicate in term 1
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 40 map[] [] 0 0 -1} 1 71}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{1215659339493418900 1 12 map[] [] 0 0 2} 1 72}] to replicate in term 1
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 41 map[] [] 0 0 -1} 1 73}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{1996281950357502684 1 7 map[] [] 0 0 2} 1 74}] to replicate in term 1
+2023/05/09 18:09:46 {Node 0} receive a new commodidx[{{3271227794175876081 1 42 map[] [] 0 0 -1} 1 75}] to replicate in term 1
+2023/05/09 18:09:46 {0} {100} {0}
+2023/05/09 18:09:46 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3271227794175876081 1 43 map[] [] 0 0 -1} 1 76}] to replicate in term 1
+2023/05/09 18:09:47 {0} {100} {0}
+2023/05/09 18:09:47 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3271227794175876081 1 44 map[] [] 0 0 -1} 1 77}] to replicate in term 1
+2023/05/09 18:09:47 {0} {100} {0}
+2023/05/09 18:09:47 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3271227794175876081 1 45 map[] [] 0 0 -1} 1 78}] to replicate in term 1
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{1215659339493418900 1 13 map[] [] 0 0 2} 1 79}] to replicate in term 1
+2023/05/09 18:09:47 {0} {100} {0}
+2023/05/09 18:09:47 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{1996281950357502684 1 8 map[] [] 0 0 2} 1 80}] to replicate in term 1
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3271227794175876081 1 46 map[] [] 0 0 -1} 1 81}] to replicate in term 1
+2023/05/09 18:09:47 {0} {100} {0}
+2023/05/09 18:09:47 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3271227794175876081 1 47 map[] [] 0 0 -1} 1 82}] to replicate in term 1
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{3726175938025782575 1 1 map[] [] 0 0 2} 1 83}] to replicate in term 1
+2023/05/09 18:09:47 {0} {100} {0}
+2023/05/09 18:09:47 wronggroup
+2023/05/09 18:09:47 {Node 0} receive a new commodidx[{{1996281950357502684 1 9 map[] [] 0 0 2} 1 84}] to replicate in term 1
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 48 map[] [] 0 0 -1} 1 85}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 49 map[] [] 0 0 -1} 1 86}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{1996281950357502684 1 10 map[] [] 0 0 2} 1 87}] to replicate in term 1
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 50 map[] [] 0 0 -1} 1 88}] to replicate in term 1
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{1215659339493418900 1 14 map[] [] 0 0 2} 1 89}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 51 map[] [] 0 0 -1} 1 90}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 52 map[] [] 0 0 -1} 1 91}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{3271227794175876081 1 53 map[] [] 0 0 -1} 1 92}] to replicate in term 1
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{1996281950357502684 1 11 map[] [] 0 0 2} 1 93}] to replicate in term 1
+2023/05/09 18:09:48 {Node 0} receive a new commodidx[{{2689577660557185039 1 4 map[] [] 0 0 2} 1 94}] to replicate in term 1
+2023/05/09 18:09:48 {0} {100} {0}
+2023/05/09 18:09:48 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 54 map[] [] 0 0 -1} 1 95}] to replicate in term 1
+2023/05/09 18:09:49 {0} {100} {0}
+2023/05/09 18:09:49 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{81714480824896013 1 1 map[] [] 0 0 2} 1 96}] to replicate in term 1
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 55 map[] [] 0 0 -1} 1 97}] to replicate in term 1
+2023/05/09 18:09:49 {0} {100} {0}
+2023/05/09 18:09:49 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 56 map[] [] 0 0 -1} 1 98}] to replicate in term 1
+2023/05/09 18:09:49 {0} {100} {0}
+2023/05/09 18:09:49 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{81714480824896013 1 2 map[] [] 0 0 2} 1 99}] to replicate in term 1
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{2689577660557185039 1 5 map[] [] 0 0 2} 1 100}] to replicate in term 1
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 57 map[] [] 0 0 -1} 1 101}] to replicate in term 1
+2023/05/09 18:09:49 {0} {100} {0}
+2023/05/09 18:09:49 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 58 map[] [] 0 0 -1} 1 102}] to replicate in term 1
+2023/05/09 18:09:49 {0} {100} {0}
+2023/05/09 18:09:49 wronggroup
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{81714480824896013 1 3 map[] [] 0 0 2} 1 103}] to replicate in term 1
+2023/05/09 18:09:49 {Node 0} receive a new commodidx[{{3271227794175876081 1 59 map[] [] 0 0 -1} 1 104}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3271227794175876081 1 60 map[] [] 0 0 -1} 1 105}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{81714480824896013 1 4 map[] [] 0 0 2} 1 106}] to replicate in term 1
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3726175938025782575 1 2 map[] [] 0 0 2} 1 107}] to replicate in term 1
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3271227794175876081 1 61 map[] [] 0 0 -1} 1 108}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3271227794175876081 1 62 map[] [] 0 0 -1} 1 109}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3726175938025782575 1 3 map[] [] 0 0 2} 1 110}] to replicate in term 1
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3271227794175876081 1 63 map[] [] 0 0 -1} 1 111}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{3271227794175876081 1 64 map[] [] 0 0 -1} 1 112}] to replicate in term 1
+2023/05/09 18:09:50 {Node 0} receive a new commodidx[{{81714480824896013 1 5 map[] [] 0 0 2} 1 113}] to replicate in term 1
+2023/05/09 18:09:50 {0} {100} {0}
+2023/05/09 18:09:50 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 65 map[] [] 0 0 -1} 1 114}] to replicate in term 1
+2023/05/09 18:09:51 {0} {100} {0}
+2023/05/09 18:09:51 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 66 map[] [] 0 0 -1} 1 115}] to replicate in term 1
+2023/05/09 18:09:51 {0} {100} {0}
+2023/05/09 18:09:51 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3726175938025782575 1 4 map[] [] 0 0 2} 1 116}] to replicate in term 1
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 67 map[] [] 0 0 -1} 1 117}] to replicate in term 1
+2023/05/09 18:09:51 {0} {100} {0}
+2023/05/09 18:09:51 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{81714480824896013 1 6 map[] [] 0 0 2} 1 118}] to replicate in term 1
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 68 map[] [] 0 0 -1} 1 119}] to replicate in term 1
+2023/05/09 18:09:51 {0} {100} {0}
+2023/05/09 18:09:51 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 69 map[] [] 0 0 -1} 1 120}] to replicate in term 1
+2023/05/09 18:09:51 {0} {100} {0}
+2023/05/09 18:09:51 wronggroup
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{3271227794175876081 1 70 map[] [] 0 0 -1} 1 121}] to replicate in term 1
+2023/05/09 18:09:51 {Node 0} receive a new commodidx[{{81714480824896013 1 7 map[] [] 0 0 2} 1 122}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3726175938025782575 1 5 map[] [] 0 0 2} 1 123}] to replicate in term 1
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3271227794175876081 1 71 map[] [] 0 0 -1} 1 124}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3271227794175876081 1 72 map[] [] 0 0 -1} 1 125}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{1215659339493418900 1 15 map[] [] 0 0 2} 1 126}] to replicate in term 1
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3271227794175876081 1 73 map[] [] 0 0 -1} 1 127}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3271227794175876081 1 74 map[] [] 0 0 -1} 1 128}] to replicate in term 1
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{81714480824896013 1 8 map[] [] 0 0 2} 1 129}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{1215659339493418900 1 16 map[] [] 0 0 2} 1 130}] to replicate in term 1
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:52 {Node 0} receive a new commodidx[{{3271227794175876081 1 75 map[] [] 0 0 -1} 1 131}] to replicate in term 1
+2023/05/09 18:09:52 {0} {100} {0}
+2023/05/09 18:09:52 wronggroup
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{3271227794175876081 1 76 map[] [] 0 0 -1} 1 132}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{81714480824896013 1 9 map[] [] 0 0 2} 1 133}] to replicate in term 1
+2023/05/09 18:09:53 {0} {100} {0}
+2023/05/09 18:09:53 wronggroup
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{1215659339493418900 1 17 map[] [] 0 0 2} 1 134}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{3271227794175876081 1 77 map[] [] 0 0 -1} 1 135}] to replicate in term 1
+2023/05/09 18:09:53 {0} {100} {0}
+2023/05/09 18:09:53 wronggroup
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{81714480824896013 1 10 map[] [] 0 0 2} 1 136}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{3271227794175876081 1 78 map[] [] 0 0 -1} 1 137}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{1215659339493418900 1 18 map[] [] 0 0 2} 1 138}] to replicate in term 1
+2023/05/09 18:09:53 {0} {100} {0}
+2023/05/09 18:09:53 wronggroup
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{3271227794175876081 1 79 map[] [] 0 0 -1} 1 139}] to replicate in term 1
+2023/05/09 18:09:53 {0} {100} {0}
+2023/05/09 18:09:53 wronggroup
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{81714480824896013 1 11 map[] [] 0 0 2} 1 140}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{3271227794175876081 1 80 map[] [] 0 0 -1} 1 141}] to replicate in term 1
+2023/05/09 18:09:53 {Node 0} receive a new commodidx[{{1215659339493418900 1 19 map[] [] 0 0 2} 1 142}] to replicate in term 1
+2023/05/09 18:09:53 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{3271227794175876081 1 81 map[] [] 0 0 -1} 1 143}] to replicate in term 1
+2023/05/09 18:09:54 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{81714480824896013 1 12 map[] [] 0 0 2} 1 144}] to replicate in term 1
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{3271227794175876081 1 82 map[] [] 0 0 -1} 1 145}] to replicate in term 1
+2023/05/09 18:09:54 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{3271227794175876081 1 83 map[] [] 0 0 -1} 1 146}] to replicate in term 1
+2023/05/09 18:09:54 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{81714480824896013 1 13 map[] [] 0 0 2} 1 147}] to replicate in term 1
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{1215659339493418900 1 20 map[] [] 0 0 2} 1 148}] to replicate in term 1
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{3271227794175876081 1 84 map[] [] 0 0 -1} 1 149}] to replicate in term 1
+2023/05/09 18:09:54 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{3271227794175876081 1 85 map[] [] 0 0 -1} 1 150}] to replicate in term 1
+2023/05/09 18:09:54 {0} {100} {0}
+2023/05/09 18:09:54 wronggroup
+2023/05/09 18:09:54 {Node 0} receive a new commodidx[{{81714480824896013 1 14 map[] [] 0 0 2} 1 151}] to replicate in term 1
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{1215659339493418900 1 21 map[] [] 0 0 2} 1 152}] to replicate in term 1
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{3271227794175876081 1 86 map[] [] 0 0 -1} 1 153}] to replicate in term 1
+2023/05/09 18:09:55 {0} {100} {0}
+2023/05/09 18:09:55 wronggroup
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{3271227794175876081 1 87 map[] [] 0 0 -1} 1 154}] to replicate in term 1
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{81714480824896013 1 15 map[] [] 0 0 2} 1 155}] to replicate in term 1
+2023/05/09 18:09:55 {0} {100} {0}
+2023/05/09 18:09:55 wronggroup
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{1215659339493418900 1 22 map[] [] 0 0 2} 1 156}] to replicate in term 1
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{3271227794175876081 1 88 map[] [] 0 0 -1} 1 157}] to replicate in term 1
+2023/05/09 18:09:55 {0} {100} {0}
+2023/05/09 18:09:55 wronggroup
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{81714480824896013 1 16 map[] [] 0 0 2} 1 158}] to replicate in term 1
+2023/05/09 18:09:55 {Node 0} receive a new commodidx[{{3271227794175876081 1 89 map[] [] 0 0 -1} 1 159}] to replicate in term 1
+2023/05/09 18:09:55 {0} {100} {0}
+2023/05/09 18:09:55 wronggroup
+2023/05/09 18:09:56 {Node 0} receive a new commodidx[{{3271227794175876081 1 90 map[] [] 0 0 -1} 1 160}] to replicate in term 1
+2023/05/09 18:09:56 {0} {100} {0}
+2023/05/09 18:09:56 wronggroup
+2023/05/09 18:09:56 {Node 0} receive a new commodidx[{{1215659339493418900 1 23 map[] [] 0 0 2} 1 161}] to replicate in term 1
+2023/05/09 18:09:56 {Node 0} receive a new commodidx[{{3271227794175876081 1 91 map[] [] 0 0 -1} 1 162}] to replicate in term 1
+2023/05/09 18:09:56 {Node 0} receive a new commodidx[{{1215659339493418900 1 24 map[] [] 0 0 2} 3 163}] to replicate in term 3
+2023/05/09 18:09:56 {Node 0} receive a new commodidx[{{81714480824896013 1 17 map[] [] 0 0 2} 3 164}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{886458744413715192 1 11 map[] [] 0 0 2} 3 165}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{1215659339493418900 1 25 map[] [] 0 0 2} 3 166}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{3271227794175876081 1 92 map[] [] 0 0 -1} 3 167}] to replicate in term 3
+2023/05/09 18:09:57 {0} {100} {0}
+2023/05/09 18:09:57 wronggroup
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{3271227794175876081 1 93 map[] [] 0 0 -1} 3 168}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{886458744413715192 1 12 map[] [] 0 0 2} 3 169}] to replicate in term 3
+2023/05/09 18:09:57 {0} {100} {0}
+2023/05/09 18:09:57 wronggroup
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{1215659339493418900 1 26 map[] [] 0 0 2} 3 170}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{3271227794175876081 1 94 map[] [] 0 0 -1} 3 171}] to replicate in term 3
+2023/05/09 18:09:57 {0} {100} {0}
+2023/05/09 18:09:57 wronggroup
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{886458744413715192 1 13 map[] [] 0 0 2} 3 172}] to replicate in term 3
+2023/05/09 18:09:57 {Node 0} receive a new commodidx[{{3271227794175876081 1 95 map[] [] 0 0 -1} 3 173}] to replicate in term 3
+2023/05/09 18:09:57 {0} {100} {0}
+2023/05/09 18:09:57 wronggroup
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{1215659339493418900 1 27 map[] [] 0 0 2} 3 174}] to replicate in term 3
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{3271227794175876081 1 96 map[] [] 0 0 -1} 3 175}] to replicate in term 3
+2023/05/09 18:09:58 {0} {100} {0}
+2023/05/09 18:09:58 wronggroup
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{3271227794175876081 1 97 map[] [] 0 0 -1} 3 176}] to replicate in term 3
+2023/05/09 18:09:58 {0} {100} {0}
+2023/05/09 18:09:58 wronggroup
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{1215659339493418900 1 28 map[] [] 0 0 2} 3 177}] to replicate in term 3
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{3271227794175876081 1 98 map[] [] 0 0 -1} 3 178}] to replicate in term 3
+2023/05/09 18:09:58 {0} {100} {0}
+2023/05/09 18:09:58 wronggroup
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{886458744413715192 1 14 map[] [] 0 0 2} 3 179}] to replicate in term 3
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{3271227794175876081 1 99 map[] [] 0 0 -1} 3 180}] to replicate in term 3
+2023/05/09 18:09:58 {0} {100} {0}
+2023/05/09 18:09:58 wronggroup
+2023/05/09 18:09:58 {Node 0} receive a new commodidx[{{3271227794175876081 1 100 map[] [] 0 0 -1} 3 181}] to replicate in term 3
+2023/05/09 18:09:58 {0} {100} {0}
+2023/05/09 18:09:58 wronggroup
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{3271227794175876081 1 101 map[] [] 0 0 -1} 3 182}] to replicate in term 3
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{1215659339493418900 1 29 map[] [] 0 0 2} 3 183}] to replicate in term 3
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{886458744413715192 1 15 map[] [] 0 0 2} 3 184}] to replicate in term 3
+2023/05/09 18:09:59 {0} {100} {0}
+2023/05/09 18:09:59 wronggroup
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{3271227794175876081 1 102 map[] [] 0 0 -1} 3 185}] to replicate in term 3
+2023/05/09 18:09:59 {0} {100} {0}
+2023/05/09 18:09:59 wronggroup
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{3271227794175876081 1 103 map[] [] 0 0 -1} 3 186}] to replicate in term 3
+2023/05/09 18:09:59 {0} {100} {0}
+2023/05/09 18:09:59 wronggroup
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{1215659339493418900 1 30 map[] [] 0 0 2} 3 187}] to replicate in term 3
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{886458744413715192 1 16 map[] [] 0 0 2} 3 188}] to replicate in term 3
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{3271227794175876081 1 104 map[] [] 0 0 -1} 3 189}] to replicate in term 3
+2023/05/09 18:09:59 {0} {100} {0}
+2023/05/09 18:09:59 wronggroup
+2023/05/09 18:09:59 {Node 0} receive a new commodidx[{{3271227794175876081 1 105 map[] [] 0 0 -1} 3 190}] to replicate in term 3
+2023/05/09 18:09:59 {0} {100} {0}
+2023/05/09 18:09:59 wronggroup
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3726175938025782575 1 6 map[] [] 0 0 2} 3 191}] to replicate in term 3
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3271227794175876081 1 106 map[] [] 0 0 -1} 3 192}] to replicate in term 3
+2023/05/09 18:10:00 {0} {100} {0}
+2023/05/09 18:10:00 wronggroup
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{886458744413715192 1 17 map[] [] 0 0 2} 3 193}] to replicate in term 3
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3271227794175876081 1 107 map[] [] 0 0 -1} 3 194}] to replicate in term 3
+2023/05/09 18:10:00 {0} {100} {0}
+2023/05/09 18:10:00 wronggroup
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3726175938025782575 1 7 map[] [] 0 0 2} 3 195}] to replicate in term 3
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3271227794175876081 1 108 map[] [] 0 0 -1} 3 196}] to replicate in term 3
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{81714480824896013 1 18 map[] [] 0 0 2} 3 197}] to replicate in term 3
+2023/05/09 18:10:00 {0} {100} {0}
+2023/05/09 18:10:00 wronggroup
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{3271227794175876081 1 109 map[] [] 0 0 -1} 3 198}] to replicate in term 3
+2023/05/09 18:10:00 {Node 0} receive a new commodidx[{{1215659339493418900 1 31 map[] [] 0 0 2} 3 199}] to replicate in term 3
+2023/05/09 18:10:00 {0} {100} {0}
+2023/05/09 18:10:00 wronggroup
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{3271227794175876081 1 110 map[] [] 0 0 -1} 3 200}] to replicate in term 3
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{81714480824896013 1 19 map[] [] 0 0 2} 3 201}] to replicate in term 3
+2023/05/09 18:10:01 {0} {100} {0}
+2023/05/09 18:10:01 wronggroup
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{3271227794175876081 1 111 map[] [] 0 0 -1} 3 202}] to replicate in term 3
+2023/05/09 18:10:01 {0} {100} {0}
+2023/05/09 18:10:01 wronggroup
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{3271227794175876081 1 112 map[] [] 0 0 -1} 3 203}] to replicate in term 3
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{81714480824896013 1 20 map[] [] 0 0 2} 3 204}] to replicate in term 3
+2023/05/09 18:10:01 {0} {100} {0}
+2023/05/09 18:10:01 wronggroup
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{1215659339493418900 1 32 map[] [] 0 0 2} 3 205}] to replicate in term 3
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{3271227794175876081 1 113 map[] [] 0 0 -1} 3 206}] to replicate in term 3
+2023/05/09 18:10:01 {0} {100} {0}
+2023/05/09 18:10:01 wronggroup
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{3271227794175876081 1 114 map[] [] 0 0 -1} 3 207}] to replicate in term 3
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{81714480824896013 1 21 map[] [] 0 0 2} 3 208}] to replicate in term 3
+2023/05/09 18:10:01 {0} {100} {0}
+2023/05/09 18:10:01 {Node 0} receive a new commodidx[{{1215659339493418900 1 33 map[] [] 0 0 2} 3 209}] to replicate in term 3
+2023/05/09 18:10:01 wronggroup
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{3271227794175876081 1 115 map[] [] 0 0 -1} 3 210}] to replicate in term 3
+2023/05/09 18:10:02 {0} {100} {0}
+2023/05/09 18:10:02 wronggroup
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{3271227794175876081 1 116 map[] [] 0 0 -1} 3 211}] to replicate in term 3
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{81714480824896013 1 22 map[] [] 0 0 2} 3 212}] to replicate in term 3
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{1215659339493418900 1 34 map[] [] 0 0 2} 3 213}] to replicate in term 3
+2023/05/09 18:10:02 {0} {100} {0}
+2023/05/09 18:10:02 wronggroup
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{3271227794175876081 1 117 map[] [] 0 0 -1} 3 214}] to replicate in term 3
+2023/05/09 18:10:02 {0} {100} {0}
+2023/05/09 18:10:02 wronggroup
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{3271227794175876081 1 118 map[] [] 0 0 -1} 3 215}] to replicate in term 3
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{81714480824896013 1 23 map[] [] 0 0 2} 3 216}] to replicate in term 3
+2023/05/09 18:10:02 {0} {100} {0}
+2023/05/09 18:10:02 wronggroup
+2023/05/09 18:10:02 {Node 0} receive a new commodidx[{{3271227794175876081 1 119 map[] [] 0 0 -1} 3 217}] to replicate in term 3
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{1215659339493418900 1 35 map[] [] 0 0 2} 3 218}] to replicate in term 3
+2023/05/09 18:10:03 {0} {100} {0}
+2023/05/09 18:10:03 wronggroup
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{3271227794175876081 1 120 map[] [] 0 0 -1} 3 219}] to replicate in term 3
+2023/05/09 18:10:03 {0} {100} {0}
+2023/05/09 18:10:03 wronggroup
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{3271227794175876081 1 121 map[] [] 0 0 -1} 3 220}] to replicate in term 3
+2023/05/09 18:10:03 {0} {100} {0}
+2023/05/09 18:10:03 wronggroup
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{1996281950357502684 1 12 map[] [] 0 0 2} 3 221}] to replicate in term 3
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{3271227794175876081 1 122 map[] [] 0 0 -1} 3 222}] to replicate in term 3
+2023/05/09 18:10:03 {0} {100} {0}
+2023/05/09 18:10:03 wronggroup
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{1215659339493418900 1 36 map[] [] 0 0 2} 3 223}] to replicate in term 3
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{3271227794175876081 1 123 map[] [] 0 0 -1} 3 224}] to replicate in term 3
+2023/05/09 18:10:03 {Node 0} receive a new commodidx[{{1996281950357502684 1 13 map[] [] 0 0 2} 3 225}] to replicate in term 3
+2023/05/09 18:10:03 {0} {100} {0}
+2023/05/09 18:10:03 wronggroup
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{3271227794175876081 1 124 map[] [] 0 0 -1} 3 226}] to replicate in term 3
+2023/05/09 18:10:04 {0} {100} {0}
+2023/05/09 18:10:04 wronggroup
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{1996281950357502684 1 14 map[] [] 0 0 2} 3 227}] to replicate in term 3
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{1215659339493418900 1 37 map[] [] 0 0 2} 3 228}] to replicate in term 3
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{3271227794175876081 1 125 map[] [] 0 0 -1} 3 229}] to replicate in term 3
+2023/05/09 18:10:04 {0} {100} {0}
+2023/05/09 18:10:04 wronggroup
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{3271227794175876081 1 126 map[] [] 0 0 -1} 3 230}] to replicate in term 3
+2023/05/09 18:10:04 {0} {100} {0}
+2023/05/09 18:10:04 wronggroup
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{1215659339493418900 1 38 map[] [] 0 0 2} 3 231}] to replicate in term 3
+2023/05/09 18:10:04 {Node 0} receive a new commodidx[{{3271227794175876081 1 127 map[] [] 0 0 -1} 3 232}] to replicate in term 3
+2023/05/09 18:10:04 {0} {100} {0}
+2023/05/09 18:10:04 wronggroup
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{3271227794175876081 1 128 map[] [] 0 0 -1} 3 233}] to replicate in term 3
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{886458744413715192 1 18 map[] [] 0 0 2} 3 234}] to replicate in term 3
+2023/05/09 18:10:05 {0} {100} {0}
+2023/05/09 18:10:05 wronggroup
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{3271227794175876081 1 129 map[] [] 0 0 -1} 3 235}] to replicate in term 3
+2023/05/09 18:10:05 {0} {100} {0}
+2023/05/09 18:10:05 wronggroup
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{1215659339493418900 1 39 map[] [] 0 0 2} 3 236}] to replicate in term 3
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{886458744413715192 1 19 map[] [] 0 0 2} 5 237}] to replicate in term 5
+2023/05/09 18:10:05 {Node 0} receive a new commodidx[{{3271227794175876081 1 130 map[] [] 0 0 -1} 5 238}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{3271227794175876081 1 131 map[] [] 0 0 -1} 5 239}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{3271227794175876081 1 132 map[] [] 0 0 -1} 5 240}] to replicate in term 5
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{886458744413715192 1 20 map[] [] 0 0 2} 5 241}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{3271227794175876081 1 133 map[] [] 0 0 -1} 5 242}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{3271227794175876081 1 134 map[] [] 0 0 -1} 5 243}] to replicate in term 5
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{1215659339493418900 1 40 map[] [] 0 0 2} 5 244}] to replicate in term 5
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{886458744413715192 1 21 map[] [] 0 0 2} 5 245}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:06 {Node 0} receive a new commodidx[{{3271227794175876081 1 135 map[] [] 0 0 -1} 5 246}] to replicate in term 5
+2023/05/09 18:10:06 {0} {100} {0}
+2023/05/09 18:10:06 wronggroup
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{3271227794175876081 1 136 map[] [] 0 0 -1} 5 247}] to replicate in term 5
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{886458744413715192 1 22 map[] [] 0 0 2} 5 248}] to replicate in term 5
+2023/05/09 18:10:07 {0} {100} {0}
+2023/05/09 18:10:07 wronggroup
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{3271227794175876081 1 137 map[] [] 0 0 -1} 5 249}] to replicate in term 5
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{1215659339493418900 1 41 map[] [] 0 0 2} 5 250}] to replicate in term 5
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{886458744413715192 1 23 map[] [] 0 0 2} 5 251}] to replicate in term 5
+2023/05/09 18:10:07 {0} {100} {0}
+2023/05/09 18:10:07 wronggroup
+2023/05/09 18:10:07 {Node 0} receive a new commodidx[{{3271227794175876081 1 138 map[] [] 0 0 -1} 5 252}] to replicate in term 5
+2023/05/09 18:10:07 {0} {100} {0}
+2023/05/09 18:10:07 wronggroup
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{3271227794175876081 1 139 map[] [] 0 0 -1} 5 253}] to replicate in term 5
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{1215659339493418900 1 42 map[] [] 0 0 2} 5 254}] to replicate in term 5
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{886458744413715192 1 24 map[] [] 0 0 2} 5 255}] to replicate in term 5
+2023/05/09 18:10:08 {0} {100} {0}
+2023/05/09 18:10:08 wronggroup
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{3271227794175876081 1 140 map[] [] 0 0 -1} 5 256}] to replicate in term 5
+2023/05/09 18:10:08 {0} {100} {0}
+2023/05/09 18:10:08 wronggroup
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{3271227794175876081 1 141 map[] [] 0 0 -1} 5 257}] to replicate in term 5
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{1215659339493418900 1 43 map[] [] 0 0 2} 5 258}] to replicate in term 5
+2023/05/09 18:10:08 {0} {100} {0}
+2023/05/09 18:10:08 wronggroup
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{3271227794175876081 1 142 map[] [] 0 0 -1} 5 259}] to replicate in term 5
+2023/05/09 18:10:08 {0} {100} {0}
+2023/05/09 18:10:08 wronggroup
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{886458744413715192 1 25 map[] [] 0 0 2} 5 260}] to replicate in term 5
+2023/05/09 18:10:08 {Node 0} receive a new commodidx[{{3271227794175876081 1 143 map[] [] 0 0 -1} 5 261}] to replicate in term 5
+2023/05/09 18:10:09 {0} {100} {0}
+2023/05/09 18:10:09 wronggroup
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{3271227794175876081 1 144 map[] [] 0 0 -1} 5 262}] to replicate in term 5
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{1215659339493418900 1 44 map[] [] 0 0 2} 5 263}] to replicate in term 5
+2023/05/09 18:10:09 {0} {100} {0}
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{886458744413715192 1 26 map[] [] 0 0 2} 5 264}] to replicate in term 5
+2023/05/09 18:10:09 wronggroup
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{3271227794175876081 1 145 map[] [] 0 0 -1} 5 265}] to replicate in term 5
+2023/05/09 18:10:09 {0} {100} {0}
+2023/05/09 18:10:09 wronggroup
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{1215659339493418900 1 45 map[] [] 0 0 2} 5 266}] to replicate in term 5
+2023/05/09 18:10:09 {Node 0} receive a new commodidx[{{3271227794175876081 1 146 map[] [] 0 0 -1} 5 267}] to replicate in term 5
 signal: interrupt
-FAIL	6.5840/shardkv	9.318s
+FAIL	6.5840/shardkv	30.282s

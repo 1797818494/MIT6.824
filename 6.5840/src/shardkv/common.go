@@ -16,6 +16,7 @@ const (
 	ErrWrongLeader = "ErrWrongLeader"
 	ErrOutDated    = "ErrOutDated"
 	ErrNoReady     = "ErrNoReady"
+	ErrTimeOut     = "ErrTimeOut"
 )
 
 type Err string
