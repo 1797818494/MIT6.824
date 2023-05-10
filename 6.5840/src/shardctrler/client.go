@@ -49,7 +49,7 @@ type RequestRpc struct {
 	CommandId int
 	ClientId  int64
 	Op_type   int
-	Num       int
+	NumId     int
 	Servers   map[int][]string
 	GIDs      []int
 	Shared    int
@@ -64,7 +64,7 @@ type ReplyRpc struct {
 func (ck *Clerk) Query(num int) Config {
 	args := &RequestRpc{LeaderId: ck.leaderId, CommandId: ck.commandId, ClientId: ck.clientId, Op_type: query_op}
 	// Your code here.
-	args.Num = num
+	args.NumId = num
 	for {
 		// try each known server.
 		var reply ReplyRpc

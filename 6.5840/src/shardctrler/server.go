@@ -13,7 +13,7 @@ import (
 	"6.5840/raft"
 )
 
-const Debug = true
+const Debug = false
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 
@@ -300,7 +300,7 @@ func (sc *ShardCtrler) Query(args *RequestRpc, reply *ReplyRpc) {
 func (sc *ShardCtrler) Process(args *RequestRpc, reply *ReplyRpc) {
 	make_op := Op{ClientId: args.ClientId, Op_type: args.Op_type, CommandId: args.CommandId}
 	if make_op.Op_type == query_op {
-		make_op.Num = args.Num
+		make_op.Num = args.NumId
 	}
 	if make_op.Op_type == leave_op {
 		make_op.Gids = args.GIDs

@@ -138,6 +138,7 @@ func (ck *Clerk) Command(request *CommandRequest) string {
 	for {
 		shard := key2shard(request.Key)
 		gid := ck.config.Shards[shard]
+		DPrintf("client gid{%v} to command", gid)
 		if servers, ok := ck.config.Groups[gid]; ok {
 			if _, ok = ck.leaderIds[gid]; !ok {
 				ck.leaderIds[gid] = 0

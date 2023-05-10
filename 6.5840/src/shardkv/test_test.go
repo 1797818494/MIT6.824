@@ -1,15 +1,18 @@
 package shardkv
 
-import "6.5840/porcupine"
-import "6.5840/models"
-import "testing"
-import "strconv"
-import "time"
-import "fmt"
-import "sync/atomic"
-import "sync"
-import "math/rand"
-import "io/ioutil"
+import (
+	"fmt"
+	"io/ioutil"
+	"math/rand"
+	"strconv"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"6.5840/models"
+	"6.5840/porcupine"
+)
 
 const linearizabilityCheckTimeout = 1 * time.Second
 
@@ -101,6 +104,7 @@ func TestJoinLeave(t *testing.T) {
 	ck := cfg.makeClient()
 
 	cfg.join(0)
+	DPrintf("phase 1")
 
 	n := 10
 	ka := make([]string, n)
@@ -115,6 +119,7 @@ func TestJoinLeave(t *testing.T) {
 	}
 
 	cfg.join(1)
+	DPrintf("phase 2")
 
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
@@ -124,6 +129,7 @@ func TestJoinLeave(t *testing.T) {
 	}
 
 	cfg.leave(0)
+	DPrintf("phase 3")
 
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
@@ -137,7 +143,7 @@ func TestJoinLeave(t *testing.T) {
 
 	cfg.checklogs()
 	cfg.ShutdownGroup(0)
-
+	DPrintf("phase 4")
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
 	}
@@ -152,7 +158,7 @@ func TestSnapshot(t *testing.T) {
 	defer cfg.cleanup()
 
 	ck := cfg.makeClient()
-
+	DPrintf("phase 1")
 	cfg.join(0)
 
 	n := 30
@@ -170,6 +176,7 @@ func TestSnapshot(t *testing.T) {
 	cfg.join(1)
 	cfg.join(2)
 	cfg.leave(0)
+	DPrintf("phase 2")
 
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
@@ -180,6 +187,7 @@ func TestSnapshot(t *testing.T) {
 
 	cfg.leave(1)
 	cfg.join(0)
+	DPrintf("phase 3")
 
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
@@ -189,7 +197,7 @@ func TestSnapshot(t *testing.T) {
 	}
 
 	time.Sleep(1 * time.Second)
-
+	DPrintf("phase 4")
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
 	}
@@ -205,6 +213,7 @@ func TestSnapshot(t *testing.T) {
 	cfg.StartGroup(0)
 	cfg.StartGroup(1)
 	cfg.StartGroup(2)
+	DPrintf("phase 5")
 
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])

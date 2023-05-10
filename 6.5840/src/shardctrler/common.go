@@ -67,7 +67,7 @@ type MoveReply struct {
 }
 
 type QueryArgs struct {
-	Num int // desired config number
+	Num_1 int // desired config number
 }
 
 type QueryReply struct {
