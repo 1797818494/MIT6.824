@@ -398,6 +398,7 @@ func TestConcurrent2(t *testing.T) {
 	cfg.join(1)
 	cfg.join(0)
 	cfg.join(2)
+	DPrintf("phase 1")
 
 	n := 10
 	ka := make([]string, n)
@@ -410,6 +411,7 @@ func TestConcurrent2(t *testing.T) {
 
 	var done int32
 	ch := make(chan bool)
+	DPrintf("phase 2")
 
 	ff := func(i int, ck1 *Clerk) {
 		defer func() { ch <- true }()
@@ -420,12 +422,12 @@ func TestConcurrent2(t *testing.T) {
 			time.Sleep(50 * time.Millisecond)
 		}
 	}
-
+	DPrintf("phase 3")
 	for i := 0; i < n; i++ {
 		ck1 := cfg.makeClient()
 		go ff(i, ck1)
 	}
-
+	DPrintf("phase 4")
 	cfg.leave(0)
 	cfg.leave(2)
 	time.Sleep(3000 * time.Millisecond)
@@ -445,12 +447,13 @@ func TestConcurrent2(t *testing.T) {
 	cfg.StartGroup(2)
 
 	time.Sleep(2 * time.Second)
+	DPrintf("phase 5")
 
 	atomic.StoreInt32(&done, 1)
 	for i := 0; i < n; i++ {
 		<-ch
 	}
-
+	DPrintf("phase 6")
 	for i := 0; i < n; i++ {
 		check(t, ck, ka[i], va[i])
 	}

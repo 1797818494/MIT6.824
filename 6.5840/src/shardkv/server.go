@@ -658,14 +658,14 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// start gc monitor goroutine to delete useless shards in remote groups
 	go kv.Monitor(kv.gcAction, GCMonitorTimeout)
 	// start entry-in-currentTerm monitor goroutine to advance commitIndex by appending empty entries in current term periodically to avoid live locks
-	// go kv.Monitor(kv.checkEntryInCurrentTermAction, EmptyEntryDetectorTimeout)
+	go kv.Monitor(kv.checkEntryInCurrentTermAction, EmptyEntryDetectorTimeout)
 	return kv
 }
 
-const ConfigureMonitorTimeout = 300 * time.Millisecond
-const MigrationMonitorTimeout = 200 * time.Millisecond
-const GCMonitorTimeout = 200 * time.Millisecond
-const EmptyEntryDetectorTimeout = 50 * time.Millisecond
+const ConfigureMonitorTimeout = 150 * time.Millisecond
+const MigrationMonitorTimeout = 100 * time.Millisecond
+const GCMonitorTimeout = 100 * time.Millisecond
+const EmptyEntryDetectorTimeout = 200 * time.Millisecond
 
 func (kv *ShardKV) Monitor(action func(), timeout time.Duration) {
 	for {
